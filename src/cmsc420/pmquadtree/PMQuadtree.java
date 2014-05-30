@@ -586,9 +586,20 @@ public abstract class PMQuadtree {
 		
 		// Checks if the road being inserted will intersect any of the existing roads
 		for (Road r : allRoads){
-			if (Inclusive2DIntersectionVerifier.intersects(g.toLine2D(),r.toLine2D()))
+			if (Inclusive2DIntersectionVerifier.intersects(g.toLine2D(),r.toLine2D())){
+				// r's cities both intersect g
+				if (Inclusive2DIntersectionVerifier.intersects(r.getStart().toPoint2D(),g.toLine2D()) 
+						&& Inclusive2DIntersectionVerifier.intersects(r.getEnd().toPoint2D(), g.toLine2D()))
+					throw new RoadIntersectsAnotherRoadThrowable();
+				
+				// g's cities both intersect r
+				if (Inclusive2DIntersectionVerifier.intersects(g.getStart().toPoint2D(),r.toLine2D()) 
+						&& Inclusive2DIntersectionVerifier.intersects(g.getEnd().toPoint2D(), r.toLine2D()))
+					throw new RoadIntersectsAnotherRoadThrowable();
+				
 				if (!r.contains(g.getStart()) && !r.contains(g.getEnd()))
 					throw new RoadIntersectsAnotherRoadThrowable();
+			}
 		}
 		
 		

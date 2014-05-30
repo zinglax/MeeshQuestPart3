@@ -26,8 +26,11 @@ public class MeeshQuest {
 	// UNCOMMENT THIS TO TEST WITH FILES
 	private File xmlOutput = new File("test1.txt");
 
-	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
-	
+	//private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
+	//private File xmlInput = new File("JohnnyMao.shortestPath.xml");
+	private File xmlInput = new File("MasterInput.xml");
+	//private File xmlInput = new File("MasterRange.xml");
+
 	
 	
     /* output DOM Document tree */
