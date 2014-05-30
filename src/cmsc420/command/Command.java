@@ -42,6 +42,7 @@ import cmsc420.pmquadtree.RoadAlreadyExistsThrowable;
 import cmsc420.pmquadtree.PMQuadtree.Black;
 import cmsc420.pmquadtree.PMQuadtree.Gray;
 import cmsc420.pmquadtree.PMQuadtree.Node;
+import cmsc420.pmquadtree.RoadIntersectsAnotherRoadThrowable;
 import cmsc420.sortedmap.GuardedAvlGTree;
 import cmsc420.sortedmap.StringComparator;
 import cmsc420.xml.XmlUtility;
@@ -464,6 +465,8 @@ First, the new road should not intersect any road already mapped at a point othe
 				addErrorNode("roadAlreadyMapped", commandNode, parametersNode);
 			} catch (OutOfBoundsThrowable e) {
 				addErrorNode("roadOutOfBounds", commandNode, parametersNode);
+			} catch (RoadIntersectsAnotherRoadThrowable e){
+				addErrorNode("roadIntersectsAnotherRoad", commandNode, parametersNode);
 			}
 		}
 	}

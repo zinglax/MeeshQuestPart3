@@ -573,7 +573,7 @@ public abstract class PMQuadtree {
 	}
 	
 	public void addRoad(final Road g) 
-			throws RoadAlreadyExistsThrowable, IsolatedCityAlreadyExistsThrowable, OutOfBoundsThrowable {
+			throws RoadAlreadyExistsThrowable, IsolatedCityAlreadyExistsThrowable, OutOfBoundsThrowable, RoadIntersectsAnotherRoadThrowable {
 		if (isIsolatedCity(g.getStart()) || isIsolatedCity(g.getEnd())) {
 			throw new IsolatedCityAlreadyExistsThrowable();
 		}
@@ -583,6 +583,14 @@ public abstract class PMQuadtree {
 		if (allRoads.contains(g) || allRoads.contains(g2)) {
 			throw new RoadAlreadyExistsThrowable();
 		}
+		
+		// Checks if the road being inserted will intersect any of the existing roads
+		for (Road r : allRoads){
+			if (Inclusive2DIntersectionVerifier.intersects(g.toLine2D(),r.toLine2D()))
+				if (!r.contains(g.getStart()) && !r.contains(g.getEnd()))
+					throw new RoadIntersectsAnotherRoadThrowable();
+		}
+		
 		
 		Rectangle2D.Float world = new Rectangle2D.Float(spatialOrigin.x, spatialOrigin.y, 
 				spatialWidth, spatialHeight);
