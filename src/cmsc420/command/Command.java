@@ -785,7 +785,9 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
 
+		final int z = processIntegerAttribute(node, "z", parametersNode);
 		final String name = processStringAttribute(node, "name", parametersNode);
+
 
 		final Element outputNode = results.createElement("output");
 
@@ -942,6 +944,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 
 		final int x = processIntegerAttribute(node, "x", parametersNode);
 		final int y = processIntegerAttribute(node, "y", parametersNode);
+		final int z = processIntegerAttribute(node, "z", parametersNode);
 		final int radius = processIntegerAttribute(node, "radius",
 				parametersNode);
 
@@ -997,6 +1000,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 
 		final int x = processIntegerAttribute(node, "x", parametersNode);
 		final int y = processIntegerAttribute(node, "y", parametersNode);
+		final int z = processIntegerAttribute(node, "z", parametersNode);
 		final int radius = processIntegerAttribute(node, "radius",
 				parametersNode);
 
@@ -1092,6 +1096,8 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		/* extract attribute values from command */
 		final int x = processIntegerAttribute(node, "x", parametersNode);
 		final int y = processIntegerAttribute(node, "y", parametersNode);
+		final int z = processIntegerAttribute(node, "z", parametersNode);
+
 
 		final Point2D.Float point = new Point2D.Float(x, y);
 

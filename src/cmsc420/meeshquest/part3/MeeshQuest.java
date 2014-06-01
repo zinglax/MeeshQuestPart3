@@ -26,10 +26,25 @@ public class MeeshQuest {
 	// UNCOMMENT THIS TO TEST WITH FILES
 	private File xmlOutput = new File("test1.txt");
 
-	//private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
-	//private File xmlInput = new File("JohnnyMao.shortestPath.xml");
-	private File xmlInput = new File("MasterInput.xml");
-	//private File xmlInput = new File("MasterRange.xml");
+//	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
+//	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
+//	private File xmlInput = new File("MasterInput.xml");
+//	private File xmlInput = new File("MasterRange.xml");
+//	private File xmlInput = new File("part2.dan.errortest1.xml");
+//	private File xmlInput = new File("part2.dan.errortest2.xml");
+//	private File xmlInput = new File("part2.dan.nearestcity1.xml");
+//	private File xmlInput = new File("part2.dan.nearestcity2.xml");
+//	private File xmlInput = new File("part2.dan.shortestpath2.xml");
+	private File xmlInput = new File("part2.dan.shortestPaths.xml");
+//	private File xmlInput = new File("part2.dander.shortestErrors.xml");
+//	private File xmlInput = new File("part2.dander.testSpatialFunctions.xml");
+//	private File xmlInput = new File("part2.dean.shortestPath.xml");
+//	private File xmlInput = new File("part2.JaredBergman.errorTest.xml");
+//	private File xmlInput = new File("part2.reeve.roadOnEdge.input.xml");
+//	private File xmlInput = new File("pm_insert_rangeroads.input.xml");
+//	private File xmlInput = new File("printavl_printpm.xml");
+//	private File xmlInput = new File("rangeRoadsTest.xml");
+
 
 	
 	
