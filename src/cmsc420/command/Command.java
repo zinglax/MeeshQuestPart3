@@ -38,11 +38,13 @@ import cmsc420.pmquadtree.IsolatedCityAlreadyExistsThrowable;
 import cmsc420.pmquadtree.OutOfBoundsThrowable;
 import cmsc420.pmquadtree.PM3Quadtree;
 import cmsc420.pmquadtree.PMQuadtree;
+import cmsc420.pmquadtree.PortalViolatesPMRulesThrowable;
 import cmsc420.pmquadtree.RoadAlreadyExistsThrowable;
 import cmsc420.pmquadtree.PMQuadtree.Black;
 import cmsc420.pmquadtree.PMQuadtree.Gray;
 import cmsc420.pmquadtree.PMQuadtree.Node;
 import cmsc420.pmquadtree.RoadIntersectsAnotherRoadThrowable;
+import cmsc420.pmquadtree.RoadViolatesPMRulesThrowable;
 import cmsc420.sortedmap.GuardedAvlGTree;
 import cmsc420.sortedmap.StringComparator;
 import cmsc420.xml.XmlUtility;
@@ -417,7 +419,7 @@ First, the new road should not intersect any road already mapped at a point othe
 	 */
 	// TODO Check if roads intersect
 	// TODO Check if the PM quadtree will be partitioned beyond a 1x1 square
-	// TODO roadNotOnOneLevel, startOrEndIsPortal, roadIntersectsAnotherRoad, roadViolatesPMRules
+	// TODO roadNotOnOneLevel, startOrEndIsPortal, roadViolatesPMRules
 	public void processMapRoad(Element node) {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
@@ -467,6 +469,10 @@ First, the new road should not intersect any road already mapped at a point othe
 				addErrorNode("roadOutOfBounds", commandNode, parametersNode);
 			} catch (RoadIntersectsAnotherRoadThrowable e){
 				addErrorNode("roadIntersectsAnotherRoad", commandNode, parametersNode);
+			} catch (RoadViolatesPMRulesThrowable e){
+				addErrorNode("roadViolatesPMRules", commandNode, parametersNode);
+			} catch (PortalViolatesPMRulesThrowable e){
+				addErrorNode("portalViolatesPMRules", commandNode, parametersNode);
 			}
 		}
 	}
@@ -532,6 +538,10 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 				addErrorNode("cityAlreadyMapped", commandNode, parametersNode);
 			} catch (OutOfBoundsThrowable e) {
 				addErrorNode("cityOutOfBounds", commandNode, parametersNode);
+			} catch (PortalViolatesPMRulesThrowable e){
+				addErrorNode("portalViolatesPMRules", commandNode, parametersNode);
+			} catch (RoadViolatesPMRulesThrowable e){
+				addErrorNode("roadViolatesPMRules", commandNode, parametersNode);
 			}
 		}
 	}

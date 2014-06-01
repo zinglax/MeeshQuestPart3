@@ -89,13 +89,15 @@ public abstract class PMQuadtree {
 		 * @param height
 		 *            height of the rectangular bounds of this node
 		 * @return this node after the city has been added
+		 * @throws RoadViolatesPMRulesThrowable 
+		 * @throws PortalViolatesPMRulesThrowable 
 		 * @throws InvalidPartitionThrowable
 		 *             if the map if partitioned too deeply
 		 * @throws IntersectingRoadsThrowable
 		 *             if this road intersects with another road
 		 */
 		public Node add(final Geometry g, final Point2D.Float origin,
-				final int width, final int height) {
+				final int width, final int height) throws RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 			throw new UnsupportedOperationException();
 		}
 		
@@ -138,13 +140,15 @@ public abstract class PMQuadtree {
 		 * @param height
 		 *            height of the rectangular bounds of this node
 		 * @return this node after the city has been added
+		 * @throws RoadViolatesPMRulesThrowable 
+		 * @throws PortalViolatesPMRulesThrowable 
 		 * @throws InvalidPartitionThrowable
 		 *             if the map if partitioned too deeply
 		 * @throws IntersectingRoadsThrowable
 		 *             if this road intersects with another road
 		 */
 		public Node add(final Geometry g, final Point2D.Float origin,
-				final int width, final int height) {
+				final int width, final int height) throws RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 			final Black blackNode = new Black();
 			return blackNode.add(g, origin, width, height);
 		}
@@ -217,9 +221,11 @@ public abstract class PMQuadtree {
 		/**
 		 * Adds a road to this black node. After insertion, if the node becomes
 		 * invalid, it will be split into a Gray node.
+		 * @throws RoadViolatesPMRulesThrowable 
+		 * @throws PortalViolatesPMRulesThrowable 
 		 */
 		public Node add(final Geometry g, final Point2D.Float origin,
-				final int width, final int height) {
+				final int width, final int height) throws RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 			if (g.isRoad()) {
 				// g is a road
 				Road r = (Road)g;
@@ -254,7 +260,13 @@ public abstract class PMQuadtree {
 				Node newGray = partition(origin, width, height);
 				if (!newGray.isValid()){
 					PMQuadtree.this.remove(g);
-					throw
+					
+					if (g.isRoad()){
+						throw new RoadViolatesPMRulesThrowable();
+					} else {
+						throw new PortalViolatesPMRulesThrowable();
+					}
+					
 				} else {
 					return newGray;
 				}
@@ -334,12 +346,14 @@ public abstract class PMQuadtree {
 		 * @param height
 		 *            height of the rectangular bounds of this node
 		 * @return the new gray node
+		 * @throws PortalViolatesPMRulesThrowable 
+		 * @throws RoadViolatesPMRulesThrowable 
 		 * @throws InvalidPartitionThrowable
 		 *             if the quadtree was partitioned too deeply
 		 * @throws IntersectingRoadsThrowable
 		 *             if two roads intersect
 		 */
-		private Node partition(final Point2D.Float origin, final int width, final int height) 
+		private Node partition(final Point2D.Float origin, final int width, final int height) throws RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable 
 		{
 			//][			
 			/* create new gray node */
@@ -475,13 +489,15 @@ public abstract class PMQuadtree {
 		 * @param height
 		 *            height of the rectangular bounds of this node
 		 * @return this node after the city has been added
+		 * @throws PortalViolatesPMRulesThrowable 
+		 * @throws RoadViolatesPMRulesThrowable 
 		 * @throws InvalidPartitionThrowable
 		 *             if the map if partitioned too deeply
 		 * @throws IntersectingRoadsThrowable
 		 *             if this road intersects with another road
 		 */
 		public Node add(final Geometry g, final Point2D.Float origin,
-				final int width, final int height) {
+				final int width, final int height) throws RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 			
 			for (int i = 0; i < 4; i++) {
 				if (g.isRoad() && Inclusive2DIntersectionVerifier.intersects(
@@ -660,7 +676,7 @@ public abstract class PMQuadtree {
 	}
 	
 	public void addRoad(final Road g) 
-			throws RoadAlreadyExistsThrowable, IsolatedCityAlreadyExistsThrowable, OutOfBoundsThrowable, RoadIntersectsAnotherRoadThrowable {
+			throws RoadAlreadyExistsThrowable, IsolatedCityAlreadyExistsThrowable, OutOfBoundsThrowable, RoadIntersectsAnotherRoadThrowable, RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 		if (isIsolatedCity(g.getStart()) || isIsolatedCity(g.getEnd())) {
 			throw new IsolatedCityAlreadyExistsThrowable();
 		}
@@ -708,7 +724,7 @@ public abstract class PMQuadtree {
 	}
 	
 	public void addIsolatedCity(final City c) 
-			throws IsolatedCityAlreadyExistsThrowable, RoadAlreadyExistsThrowable, OutOfBoundsThrowable {
+			throws IsolatedCityAlreadyExistsThrowable, RoadAlreadyExistsThrowable, OutOfBoundsThrowable, RoadViolatesPMRulesThrowable, PortalViolatesPMRulesThrowable {
 		if (numRoadsForCity.get(c.getName()) != null) {
 			if (numRoadsForCity.get(c.getName()) > 0) {
 				throw new RoadAlreadyExistsThrowable();
