@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import cmsc420.geometry.Geometry;
 import cmsc420.pmquadtree.PMQuadtree.Black;
+import cmsc420.pmquadtree.PMQuadtree.Gray;
 import cmsc420.geometry.Road;
 
 public class PM1Validator implements Validator {
@@ -28,7 +29,7 @@ public class PM1Validator implements Validator {
 		// One city with all roads going to it
 		if (node.getNumPoints() == 1){
 			// Copies the list of Geo. items in the node
-			LinkedList<Geometry> temp = new LinkedList();
+			LinkedList<Geometry> temp = new LinkedList<Geometry>();
 			temp.addAll(node.geometry);
 			
 			// Removes city from temp list (They all should be roads now)
@@ -44,4 +45,13 @@ public class PM1Validator implements Validator {
 		return true;
 		
 	}
+	
+	public boolean valid(final Gray node){
+		if (node.halfHeight < 1 || node.halfWidth < 1){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 }

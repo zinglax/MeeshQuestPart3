@@ -98,6 +98,10 @@ public abstract class PMQuadtree {
 				final int width, final int height) {
 			throw new UnsupportedOperationException();
 		}
+		
+		public Node remove(final Geometry g, final Point2D.Float origin, final int width, final int height){
+			throw new UnsupportedOperationException();
+		}
 
 		/**
 		 * Returns if this node follows the rules of the PM Quadtree.
@@ -144,7 +148,8 @@ public abstract class PMQuadtree {
 			final Black blackNode = new Black();
 			return blackNode.add(g, origin, width, height);
 		}
-
+		
+			
 		/**
 		 * Returns if this node follows the rules of the PM Quadtree.
 		 * 
@@ -243,9 +248,37 @@ public abstract class PMQuadtree {
 				/* valid so return this black node */
 				return this;
 			} else {
+				
+				// TODO must check if the partition is valid as well
 				/* invalid so partition into a Gray node */
-				return partition(origin, width, height);
+				Node newGray = partition(origin, width, height);
+				if (!newGray.isValid()){
+					PMQuadtree.this.remove(g);
+					throw
+				} else {
+					return newGray;
+				}
+					
+				
 			}
+		}
+		
+		/**
+		 * Removes a geometry from the node
+		 */
+		public Node remove(final Geometry g, final Point2D.Float origin, final int width, final int height){
+			// decrements point count
+			if (g.isCity())
+				numPoints--;
+			
+			// removes geometry from list
+			geometry.remove(g);
+			
+			// if the black node is now a white node
+			if (geometry.size() == 0)
+				return white;		
+			
+			return this;
 		}
 
 		/**
@@ -461,6 +494,60 @@ public abstract class PMQuadtree {
 			}
 			return this;
 		}
+		
+
+		public Node remove(final Geometry g, final Point2D.Float origin, final int width, final int height){
+
+			// Removes the geometry from children
+			if (g.isCity()){
+				for (int i = 0; i < 4; i++) {
+					if (g.isRoad() && Inclusive2DIntersectionVerifier.intersects(
+							((Road)g).toLine2D(),regions[i]) 
+							|| g.isCity() && Inclusive2DIntersectionVerifier.intersects(
+									((City)g).toPoint2D(),regions[i])) {
+						children[i] = children[i].remove(g, origins[i], halfWidth,
+								halfHeight);
+					}
+				}	
+			}
+			
+			int whiteCount = 0;
+			// Count White children
+			for (int i = 0; i < 4; i++) {
+				if (children[i].type == Node.WHITE)
+					whiteCount++;
+			}
+			
+			// Check all white
+			if (whiteCount == 4){
+				return white;
+			}
+			
+			// Check if one is black
+			if (whiteCount == 3){
+				for (int i = 0; i < 4; i++) {
+					if (children[i].type == Node.BLACK)
+						return children[i];
+				}
+			}
+			
+			int grayCount = 0;
+			// Count Gray Children
+			for (int i = 0; i < 4; i++) {
+				if (children[i].type == Node.GRAY)
+					grayCount++;
+			}
+			
+			if (grayCount != 4){
+				Black b = new Black();
+				b = addAllGeometries(b,this);
+				if (b.isValid()){
+					return b;
+				}
+			}
+			return this;
+
+		}
 
 		/**
 		 * Returns if this node follows the rules of the PM Quadtree.
@@ -469,7 +556,7 @@ public abstract class PMQuadtree {
 		 *         Quadtree; <code>false</code> otherwise
 		 */
 		public boolean isValid() {
-			return children[0].isValid() && children[1].isValid()
+			return validator.valid(this) &&children[0].isValid() && children[1].isValid()
 					&& children[2].isValid() && children[3].isValid();
 		}
 
@@ -688,6 +775,26 @@ public abstract class PMQuadtree {
 		return allRoads.size();
 	}
 	
+	private Black addAllGeometries(Black black, Node node){
+		
+		if (node.type == Node.BLACK){
+			Black b = (Black) node;
+			for (Geometry g : b.geometry){
+				if (!(black.geometry.contains(g))){
+					black.addGeometryToList(g);
+				}				
+			}
+			
+		} else if (node.type == Node.GRAY) {
+			Gray g = (Gray) node;
+			for (Node n : g.children){
+				black = addAllGeometries(black, n);
+			}
+		}
+		
+		return black;
+	}
+	
 	public boolean isIsolatedCity(Geometry g) {
 		if (!g.isCity()) {
 			return false;
@@ -698,5 +805,9 @@ public abstract class PMQuadtree {
 			return false;
 		}
 		return true;
+	}
+	
+	public void remove(Geometry g){
+		root.remove(g, spatialOrigin, spatialWidth, spatialHeight);
 	}
 }
