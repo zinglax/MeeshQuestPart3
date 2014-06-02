@@ -160,6 +160,8 @@ public class City extends Geometry {
 		location.append(getX());
 		location.append(",");
 		location.append(getY());
+		location.append(",");
+		location.append(getZ());		
 		location.append(")");
 		return location.toString();
 
