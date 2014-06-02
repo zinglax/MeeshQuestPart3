@@ -578,7 +578,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 			saveHTMLName = processStringAttribute(node, "saveHTML",
 					parametersNode);
 		}
-
+		
 		if (!pmQuadtree.containsCity(start)) {
 			addErrorNode("nonExistentStart", commandNode, parametersNode);
 		} else if (!pmQuadtree.containsCity(end)) {

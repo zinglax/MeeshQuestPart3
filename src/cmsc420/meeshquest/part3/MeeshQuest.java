@@ -33,9 +33,9 @@ public class MeeshQuest {
 //	private File xmlInput = new File("part2.dan.errortest1.xml");
 //	private File xmlInput = new File("part2.dan.errortest2.xml");
 //	private File xmlInput = new File("part2.dan.nearestcity1.xml");
-//	private File xmlInput = new File("part2.dan.nearestcity2.xml");
+	private File xmlInput = new File("part2.dan.nearestcity2.xml");
 //	private File xmlInput = new File("part2.dan.shortestpath2.xml");
-	private File xmlInput = new File("part2.dan.shortestPaths.xml");
+//	private File xmlInput = new File("part2.dan.shortestPaths.xml");
 //	private File xmlInput = new File("part2.dander.shortestErrors.xml");
 //	private File xmlInput = new File("part2.dander.testSpatialFunctions.xml");
 //	private File xmlInput = new File("part2.dean.shortestPath.xml");

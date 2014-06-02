@@ -714,12 +714,14 @@ public abstract class PMQuadtree {
 
 		root = root.add(g, spatialOrigin, spatialWidth, spatialHeight);
 		allRoads.add(g);
-		if (Inclusive2DIntersectionVerifier.intersects(g.getStart().toPoint2D(), world)) {
+		if (Inclusive2DIntersectionVerifier.intersects(g.getStart().toPoint2D(), world) && Inclusive2DIntersectionVerifier.intersects(g.getEnd().toPoint2D(), world)) {
 			increaseNumRoadsMap(g.getStart().getName());
-		}
-		if (Inclusive2DIntersectionVerifier.intersects(g.getEnd().toPoint2D(), world)) {
 			increaseNumRoadsMap(g.getEnd().getName());
+
 		}
+//		if (Inclusive2DIntersectionVerifier.intersects(g.getEnd().toPoint2D(), world)) {
+//			increaseNumRoadsMap(g.getEnd().getName());
+//		}
 
 	}
 	
