@@ -26,6 +26,7 @@ public class MeeshQuest {
 	// UNCOMMENT THIS TO TEST WITH FILES
 	private File xmlOutput = new File("test1.txt");
 
+	// Converted part 2 tests
 //	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
 //	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
 //	private File xmlInput = new File("MasterInput.xml");
@@ -42,10 +43,15 @@ public class MeeshQuest {
 //	private File xmlInput = new File("part2.JaredBergman.errorTest.xml");
 //	private File xmlInput = new File("part2.reeve.roadOnEdge.input.xml");
 //	private File xmlInput = new File("pm_insert_rangeroads.input.xml");
-	private File xmlInput = new File("printavl_printpm.xml");
+//	private File xmlInput = new File("printavl_printpm.xml");
 //	private File xmlInput = new File("rangeRoadsTest.xml");
+	
+	// Part 3 Public tests
+//	private File xmlInput = new File("testfiles/part3.public.portal.input.xml");
+//	private File xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
-
+	// Part 3 Student Tests
+	private File xmlInput = new File("part3.danzou.insertDelete.xml");
 	
 	
     /* output DOM Document tree */
@@ -139,6 +145,8 @@ public class MeeshQuest {
             command.processMapRoad(commandNode);
         } else if (name.equals("mapCity")) {
             command.processMapCity(commandNode);
+        } else if (name.equals("mapPortal")) {
+            command.processMapPortal(commandNode);
         } else if (name.equals("printPMQuadtree")) {
             command.processPrintPMQuadtree(commandNode);
         } else if (name.equals("saveMap")) {

@@ -64,6 +64,12 @@ public class City extends Geometry {
 		this.color = city.color;
 	}
 
+	public City(String name, int x, int y, int z) {
+		this.name = name;
+		pt = new Point2D.Float(x, y);
+		this.z = z;
+}
+
 	/**
 	 * Gets the name of this city.
 	 * 

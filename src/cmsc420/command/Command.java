@@ -34,11 +34,16 @@ import cmsc420.geometry.CityLocationComparator;
 import cmsc420.geometry.Geometry;
 import cmsc420.geometry.Road;
 import cmsc420.geometry.RoadAdjacencyList;
+import cmsc420.pmquadtree.DuplicatePortalCoordinatesThrowable;
+import cmsc420.pmquadtree.DuplicatePortalNameThrowable;
 import cmsc420.pmquadtree.IsolatedCityAlreadyExistsThrowable;
 import cmsc420.pmquadtree.OutOfBoundsThrowable;
 import cmsc420.pmquadtree.PM3Quadtree;
 import cmsc420.pmquadtree.PMQuadtree;
+import cmsc420.pmquadtree.PortalIntersectsRoadThrowable;
+import cmsc420.pmquadtree.PortalOutOfBoundsThrowable;
 import cmsc420.pmquadtree.PortalViolatesPMRulesThrowable;
+import cmsc420.pmquadtree.RedundantPortalThrowable;
 import cmsc420.pmquadtree.RoadAlreadyExistsThrowable;
 import cmsc420.pmquadtree.PMQuadtree.Black;
 import cmsc420.pmquadtree.PMQuadtree.Gray;
@@ -477,15 +482,7 @@ First, the new road should not intersect any road already mapped at a point othe
 		}
 	}
 	
-	/**
-	 * Creates a portal at the specified x, y, and z coordinates. Note that unlike plain old cities, a portal doesn’t get its data from a createCity. That’s because it isn’t a city. (So you shouldn’t store it in any dictionaries. This is also, incidentally, why it can’t be the endpoint for any road.) It’s something else entirely.
-There’s only one portal per z. Any others are redundant. No two portals, furthermore, may share the same name or coordinates. Predictably-named errors should be returned when this occurs. Portals also can’t share names or coordinates with any city.
-	 * @param node
-	 */
-	// TODO redundantPortal, duplicatePortalName, duplicatePortalCoordinates, portalOutOfBounds, portalIntersectsRoad, portalViolatesPMRules
-	public void processMapPortal(Element node){
-		
-	}
+
 	
 	/**
 	 * Removes a road and its associated endpoints from the map unless the endpoint (city) is part of another mapped road.
@@ -517,6 +514,45 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
             addSuccessNode(commandNode, parametersNode, outputNode);
         }
     }
+    
+	/**
+	 * Creates a portal at the specified x, y, and z coordinates. Note that unlike plain old cities, a portal doesn’t get its data from a createCity. That’s because it isn’t a city. (So you shouldn’t store it in any dictionaries. This is also, incidentally, why it can’t be the endpoint for any road.) It’s something else entirely.
+There’s only one portal per z. Any others are redundant. No two portals, furthermore, may share the same name or coordinates. Predictably-named errors should be returned when this occurs. Portals also can’t share names or coordinates with any city.
+	 * @param node
+	 */
+	// TODO redundantPortal, duplicatePortalName, duplicatePortalCoordinates, portalOutOfBounds, portalIntersectsRoad, portalViolatesPMRules
+	public void processMapPortal(Element node){
+		final Element commandNode = getCommandNode(node);
+		final Element parametersNode = results.createElement("parameters");
+
+		final String name = processStringAttribute(node, "name", parametersNode);
+		final Element outputNode = results.createElement("output");		
+		final int x = processIntegerAttribute(node, "x", parametersNode);
+		final int y = processIntegerAttribute(node, "y", parametersNode);
+		final int z = processIntegerAttribute(node, "z", parametersNode);
+		
+		City newPort = new City(name, x, y, z);
+		
+		try {
+			pmQuadtree.addPortal(newPort);
+			/* add success node to results */
+			addSuccessNode(commandNode, parametersNode, outputNode);
+		} catch (PortalViolatesPMRulesThrowable e){
+			addErrorNode("portalViolatesPMRules", commandNode, parametersNode);
+		} catch (RoadViolatesPMRulesThrowable e){
+			addErrorNode("roadViolatesPMRules", commandNode, parametersNode);
+		} catch (PortalOutOfBoundsThrowable e){
+			addErrorNode("portalOutOfBounds", commandNode, parametersNode);
+		} catch (PortalIntersectsRoadThrowable e){
+			addErrorNode("portalIntersectsRoad", commandNode, parametersNode);
+		} catch (DuplicatePortalCoordinatesThrowable e){
+			addErrorNode("duplicatePortalCoordinates", commandNode, parametersNode);
+		} catch (DuplicatePortalNameThrowable e){
+			addErrorNode("duplicatePortalName", commandNode, parametersNode);
+		} catch (RedundantPortalThrowable e){
+			addErrorNode("redundantPortal", commandNode, parametersNode);
+		}
+	}
     
 	public void processMapCity(Element node) {
 		final Element commandNode = getCommandNode(node);
