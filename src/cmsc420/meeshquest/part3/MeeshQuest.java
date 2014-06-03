@@ -51,7 +51,8 @@ public class MeeshQuest {
 //	private File xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
 	// Part 3 Student Tests
-	private File xmlInput = new File("part3.danzou.insertDelete.xml");
+//	private File xmlInput = new File("part3.danzou.insertDelete.xml");
+	private File xmlInput = new File("pm1_insert_delete.xml");
 	
 	
     /* output DOM Document tree */
