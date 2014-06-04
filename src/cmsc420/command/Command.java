@@ -34,6 +34,9 @@ import cmsc420.geometry.CityLocationComparator;
 import cmsc420.geometry.Geometry;
 import cmsc420.geometry.Road;
 import cmsc420.geometry.RoadAdjacencyList;
+import cmsc420.levels.Leveler;
+import cmsc420.pmquadtree.DuplicateCityCoordinateThrowable;
+import cmsc420.pmquadtree.DuplicateCityNameThrowable;
 import cmsc420.pmquadtree.DuplicatePortalCoordinatesThrowable;
 import cmsc420.pmquadtree.DuplicatePortalNameThrowable;
 import cmsc420.pmquadtree.IsolatedCityAlreadyExistsThrowable;
@@ -59,6 +62,10 @@ import cmsc420.xml.XmlUtility;
  * node, processes the node, and outputs the results.
  */
 public class Command {
+	
+	// Levels
+	protected Leveler l;
+	
 	/** output DOM Document tree */
 	protected Document results;
 
@@ -69,28 +76,28 @@ public class Command {
 	 * stores created cities sorted by their names (used with listCities
 	 * command)
 	 */
-	protected GuardedAvlGTree<String, City> citiesByName;
+	//protected GuardedAvlGTree<String, City> citiesByName;
 
 	/**
 	 * stores created cities sorted by their locations (used with listCities
 	 * command)
 	 */
-	protected final TreeSet<City> citiesByLocation = new TreeSet<City>(
-			new CityLocationComparator());
+	//protected final TreeSet<City> citiesByLocation = new TreeSet<City>(
+	//		new CityLocationComparator());
 
-	private final RoadAdjacencyList roads = new RoadAdjacencyList();
+	//private final RoadAdjacencyList roads = new RoadAdjacencyList();
 
 	/** stores mapped cities in a spatial data structure */
 	protected PMQuadtree pmQuadtree;
 
 	/** order of the PM Quadtree */
-	protected int pmOrder;
+	//protected int pmOrder;
 
 	/** spatial width of the PM Quadtree */
-	protected int spatialWidth;
+	//protected int spatialWidth;
 
 	/** spatial height of the PM Quadtree */
-	protected int spatialHeight;
+	//protected int spatialHeight;
 
 	/**
 	 * Set the DOM Document tree to send the results of processed commands to.
@@ -228,18 +235,14 @@ public class Command {
 	 *            commands node to be processed
 	 */
 	public void processCommands(final Element node) {
-		spatialWidth = Integer.parseInt(node.getAttribute("spatialWidth"));
-		spatialHeight = Integer.parseInt(node.getAttribute("spatialHeight"));
-		pmOrder = Integer.parseInt(node.getAttribute("pmOrder"));
-		pmQuadtree = null;
+		int width = Integer.parseInt(node.getAttribute("spatialWidth"));
+		int height = Integer.parseInt(node.getAttribute("spatialHeight"));
+		int pmorder = Integer.parseInt(node.getAttribute("pmOrder"));
+		int avlorder = Integer.parseInt(node.getAttribute("g"));
 		
 		// TODO Create a PM1 tree & check if command has errors
+		l = new Leveler(width,height,pmorder, avlorder);
 		
-		if (pmOrder == 3) {
-			pmQuadtree = new PM3Quadtree(spatialWidth, spatialHeight);
-		}
-        citiesByName = new GuardedAvlGTree<String, City>(new StringComparator(),
-                Integer.parseInt(node.getAttribute("g")));
 	}
 	
 	/**
@@ -266,12 +269,10 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 	public void processCreateCity(final Element node) {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
-
 		final String name = processStringAttribute(node, "name", parametersNode);
 		final int x = processIntegerAttribute(node, "x", parametersNode);
 		final int y = processIntegerAttribute(node, "y", parametersNode);
 		final int z = processIntegerAttribute(node, "z", parametersNode);
-
 		final int radius = processIntegerAttribute(node, "radius",
 				parametersNode);
 		final String color = processStringAttribute(node, "color",
@@ -280,22 +281,16 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 		/* create the city */
 		final City city = new City(name, x, y, z, radius, color);
 
-		// TODO City names and coordinates cannot be the same as those of existing portals
-		if (citiesByName.containsKey(name)) {
-			addErrorNode("duplicateCityName", commandNode, parametersNode);
-		} else if (citiesByLocation.contains(city)) {
-			addErrorNode("duplicateCityCoordinates", commandNode,
-					parametersNode);
-		} else {
+		try {
 			final Element outputNode = results.createElement("output");
-
-			/* add city to dictionary */
-			citiesByName.put(name, city);
-			citiesByLocation.add(city);
-
-			/* add success node to results */
+			l.createCity(city);
 			addSuccessNode(commandNode, parametersNode, outputNode);
+		} catch (DuplicateCityNameThrowable e) {
+			addErrorNode("duplicateCityName", commandNode, parametersNode);
+		} catch (DuplicateCityCoordinateThrowable e) {
+			addErrorNode("duplicateCityCoordinates", commandNode, parametersNode);
 		}
+		
 	}
 
 	/**
@@ -311,10 +306,10 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 		final Element outputNode = results.createElement("output");
 
 		/* clear data structures */
-		citiesByName.clear();
-		citiesByLocation.clear();
+		l.citiesByName.clear();
+		l.citiesByLocation.clear();
 		pmQuadtree.clear();
-		roads.clear();
+		l.roads.clear();
 
 		/* clear canvas */
 		// canvas.clear();
@@ -337,7 +332,7 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 		final String sortBy = processStringAttribute(node, "sortBy",
 				parametersNode);
 
-		if (citiesByName.isEmpty()) {
+		if (l.citiesByName.isEmpty()) {
 			addErrorNode("noCitiesToList", commandNode, parametersNode);
 		} else {
 			final Element outputNode = results.createElement("output");
@@ -345,8 +340,8 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 
 			Collection<City> cityCollection = null;
 			if (sortBy.equals("name")) {
-				List<City> cities = new ArrayList<City>(citiesByLocation.size());
-				for (City c : citiesByLocation)
+				List<City> cities = new ArrayList<City>(l.citiesByLocation.size());
+				for (City c : l.citiesByLocation)
 					cities.add(c);
 				Collections.sort(cities, new Comparator<City>() {
 
@@ -357,7 +352,7 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 				});
 				cityCollection = cities;
 			} else if (sortBy.equals("coordinate")) {
-				cityCollection = citiesByLocation;
+				cityCollection = l.citiesByLocation;
 			} else {
 				/* XML validator failed */
 				System.exit(-1);
@@ -435,27 +430,27 @@ First, the new road should not intersect any road already mapped at a point othe
 
 		final Element outputNode = results.createElement("output");
 
-		if (!citiesByName.containsKey(start)) {
+		if (!l.citiesByName.containsKey(start)) {
 			addErrorNode("startPointDoesNotExist", commandNode, parametersNode);
-		} else if (!citiesByName.containsKey(end)) {
+		} else if (!l.citiesByName.containsKey(end)) {
 			addErrorNode("endPointDoesNotExist", commandNode, parametersNode);
 		} else if (start.equals(end)) {
 			addErrorNode("startEqualsEnd", commandNode, parametersNode);
 		} else {
 			try {
 				// add to spatial structure
-				pmQuadtree.addRoad(new Road((City) citiesByName.get(start),
-						(City) citiesByName.get(end)));
-				if (Inclusive2DIntersectionVerifier.intersects(citiesByName
+				pmQuadtree.addRoad(new Road((City) l.citiesByName.get(start),
+						(City) l.citiesByName.get(end)));
+				if (Inclusive2DIntersectionVerifier.intersects(l.citiesByName
 						.get(start).toPoint2D(), new Rectangle2D.Float(0, 0,
-						spatialWidth, spatialHeight))
+						l.spatialWidth, l.spatialHeight))
 						&& Inclusive2DIntersectionVerifier.intersects(
-								citiesByName.get(end).toPoint2D(),
-								new Rectangle2D.Float(0, 0, spatialWidth,
-										spatialHeight))) {
+								l.citiesByName.get(end).toPoint2D(),
+								new Rectangle2D.Float(0, 0, l.spatialWidth,
+										l.spatialHeight))) {
 					// add to adjacency list
-					roads.addRoad((City) citiesByName.get(start),
-							(City) citiesByName.get(end));
+					l.roads.addRoad((City) l.citiesByName.get(start),
+							(City) l.citiesByName.get(end));
 				}
 				// create roadCreated element
 				final Element roadCreatedNode = results
@@ -507,10 +502,10 @@ First, the new road should not intersect any road already mapped at a point othe
         final Element parametersNode = results.createElement("parameters");
         final Element outputNode = results.createElement("output");
 
-        if (citiesByName.isEmpty()) {
+        if (l.citiesByName.isEmpty()) {
             addErrorNode("emptyTree", commandNode, parametersNode);
         } else {
-            outputNode.appendChild(citiesByName.createXml(outputNode));
+            outputNode.appendChild(l.citiesByName.createXml(outputNode));
             addSuccessNode(commandNode, parametersNode, outputNode);
         }
     }
@@ -561,11 +556,11 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 		final String name = processStringAttribute(node, "name", parametersNode);
 		final Element outputNode = results.createElement("output");
 
-		if (!citiesByName.containsKey(name)) {
+		if (!l.citiesByName.containsKey(name)) {
 			addErrorNode("nameNotInDictionary", commandNode, parametersNode);
 		} else {
 			try {
-				pmQuadtree.addIsolatedCity(citiesByName.get(name));
+				pmQuadtree.addIsolatedCity(l.citiesByName.get(name));
 				/* add success node to results */
 				addSuccessNode(commandNode, parametersNode, outputNode);
 			} catch (RoadAlreadyExistsThrowable e) {
@@ -619,8 +614,8 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 			addErrorNode("nonExistentStart", commandNode, parametersNode);
 		} else if (!pmQuadtree.containsCity(end)) {
 			addErrorNode("nonExistentEnd", commandNode, parametersNode);
-		} else if (!roads.getCitySet().contains(citiesByName.get(start))
-				|| !roads.getCitySet().contains(citiesByName.get(end))) {
+		} else if (!l.roads.getCitySet().contains(l.citiesByName.get(start))
+				|| !l.roads.getCitySet().contains(l.citiesByName.get(end))) {
 			// start or end is isolated
 			if (start.equals(end)) {
 				final Element outputNode = results.createElement("output");
@@ -629,7 +624,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 				pathNode.setAttribute("hops", "0");
 
 				LinkedList<City> cityList = new LinkedList<City>();
-				cityList.add(citiesByName.get(start));
+				cityList.add(l.citiesByName.get(start));
 				/* if required, save the map to an image */
 				if (!saveMapName.equals("")) {
 					saveShortestPathMap(saveMapName, cityList);
@@ -659,10 +654,10 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		} else {
 			final DecimalFormat decimalFormat = new DecimalFormat("#0.000");
 
-			final Dijkstranator dijkstranator = new Dijkstranator(roads);
+			final Dijkstranator dijkstranator = new Dijkstranator(l.roads);
 
-			final City startCity = (City) citiesByName.get(start);
-			final City endCity = (City) citiesByName.get(end);
+			final City startCity = (City) l.citiesByName.get(start);
+			final City endCity = (City) l.citiesByName.get(end);
 
 			final Path path = dijkstranator.getShortestPath(startCity, endCity);
 
@@ -758,9 +753,9 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 			final List<City> cityList) throws IOException {
 		final CanvasPlus map = new CanvasPlus();
 		/* initialize map */
-		map.setFrameSize(spatialWidth, spatialHeight);
+		map.setFrameSize(l.spatialWidth, l.spatialHeight);
 		/* add a rectangle to show where the bounds of the map are located */
-		map.addRectangle(0, 0, spatialWidth, spatialHeight, Color.BLACK, false);
+		map.addRectangle(0, 0, l.spatialWidth, l.spatialHeight, Color.BLACK, false);
 
 		final Iterator<City> it = cityList.iterator();
 		City city1 = it.next();
@@ -842,10 +837,10 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final CanvasPlus canvas = new CanvasPlus("MeeshQuest");
 
 		/* initialize canvas */
-		canvas.setFrameSize(spatialWidth, spatialHeight);
+		canvas.setFrameSize(l.spatialWidth, l.spatialHeight);
 
 		/* add a rectangle to show where the bounds of the map are located */
-		canvas.addRectangle(0, 0, spatialWidth, spatialHeight, Color.BLACK,
+		canvas.addRectangle(0, 0, l.spatialWidth, l.spatialHeight, Color.BLACK,
 				false);
 
 		/* draw PM Quadtree */
@@ -899,7 +894,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		} else {
 			/* print PR Quadtree */
 			final Element quadtreeNode = results.createElement("quadtree");
-			quadtreeNode.setAttribute("order", Integer.toString(pmOrder));
+			quadtreeNode.setAttribute("order", Integer.toString(l.pmOrder));
 			printPMQuadtreeHelper(pmQuadtree.getRoot(), quadtreeNode);
 
 			outputNode.appendChild(quadtreeNode);
@@ -1308,8 +1303,8 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 				parametersNode);
 		final String end = processStringAttribute(node, "end", parametersNode);
 
-		final City startCity = (City) citiesByName.get(start);
-		final City endCity = (City) citiesByName.get(end);
+		final City startCity = (City) l.citiesByName.get(start);
+		final City endCity = (City) l.citiesByName.get(end);
 		if (startCity == null || endCity == null) {
 			addErrorNode("roadIsNotMapped", commandNode, parametersNode);
 			return;
