@@ -14,184 +14,258 @@ import cmsc420.pmquadtree.DuplicateCityCoordinateThrowable;
 import cmsc420.pmquadtree.DuplicateCityNameThrowable;
 import cmsc420.pmquadtree.DuplicatePortalCoordinatesThrowable;
 import cmsc420.pmquadtree.DuplicatePortalNameThrowable;
+import cmsc420.pmquadtree.EndPointDoesNotExistThrowable;
+import cmsc420.pmquadtree.IsolatedCityAlreadyExistsThrowable;
+import cmsc420.pmquadtree.OutOfBoundsThrowable;
+import cmsc420.pmquadtree.PM1Quadtree;
+import cmsc420.pmquadtree.PM3Quadtree;
 import cmsc420.pmquadtree.PMQuadtree;
 import cmsc420.pmquadtree.PortalOutOfBoundsThrowable;
+import cmsc420.pmquadtree.PortalViolatesPMRulesThrowable;
 import cmsc420.pmquadtree.RedundantPortalThrowable;
+import cmsc420.pmquadtree.RoadAlreadyExistsThrowable;
+import cmsc420.pmquadtree.RoadIntersectsAnotherRoadThrowable;
+import cmsc420.pmquadtree.RoadNotOnOneLevelThrowable;
+import cmsc420.pmquadtree.RoadOutOfBoundsThrowable;
+import cmsc420.pmquadtree.RoadViolatesPMRulesThrowable;
+import cmsc420.pmquadtree.StartEqualsEndThrowable;
+import cmsc420.pmquadtree.StartOrEndIsPortalThrowable;
+import cmsc420.pmquadtree.StartPointDoesNotExistThrowable;
 import cmsc420.pmquadtree.Validator;
 import cmsc420.sortedmap.GuardedAvlGTree;
 import cmsc420.sortedmap.StringComparator;
 
 public class Leveler {
-	
+
 	// Spatial Information used for PM quadtree generation
 	public int spatialWidth;
 	public int spatialHeight;
 	public Point2D.Float spatialOrigin;
 	public Validator validator;
 	public int pmOrder;
-	
+
 	public GuardedAvlGTree<String, City> citiesByName;
 	public TreeSet<City> citiesByLocation = new TreeSet<City>(
 			new CityLocationComparator());
-	
+
 	public RoadAdjacencyList roads = new RoadAdjacencyList();
 
 	// PM Quadtree associated with each level
 	public HashMap<Integer, PMQuadtree> levels = new HashMap<Integer, PMQuadtree>();
-	
+
 	// Portals associated with specific level
 	public HashMap<Integer, City> portals = new HashMap<Integer, City>();
-	
+
 	// Constructor
-	public Leveler(int spatialWidth, int spatialHeight, int pmOrder, int avlOrder){
+	public Leveler(int spatialWidth, int spatialHeight, int pmOrder,
+			int avlOrder) {
 		this.spatialWidth = spatialWidth;
 		this.spatialHeight = spatialHeight;
 		this.pmOrder = pmOrder;
-		this.citiesByName = new GuardedAvlGTree<String, City>(new StringComparator(), avlOrder); 
-		
-	}
-	
+		this.citiesByName = new GuardedAvlGTree<String, City>(
+				new StringComparator(), avlOrder);
 
+	}
 
 	// Adding a portal
-	public void addPortal(City c) throws RedundantPortalThrowable, DuplicatePortalCoordinatesThrowable, DuplicatePortalNameThrowable, PortalOutOfBoundsThrowable{
-		
+	public void addPortal(City c) throws RedundantPortalThrowable,
+			DuplicatePortalCoordinatesThrowable, DuplicatePortalNameThrowable,
+			PortalOutOfBoundsThrowable {
+
 		// Check if portal already exists on level
-		if (portals.containsKey(c.getZ())){
+		if (portals.containsKey(c.getZ())) {
 			throw new RedundantPortalThrowable();
 		}
-		
+
 		// Duplicate Portal Coordinates
-		for (City i : portals.values()){
-			if (i.getLocationString().equals(c.getLocationString())){
+		for (City i : portals.values()) {
+			if (i.getLocationString().equals(c.getLocationString())) {
 				throw new DuplicatePortalCoordinatesThrowable();
 			}
 		}
-		
+
 		// Duplicate Portal Name
-		for (City i : portals.values()){
-			if (i.getName().equals(c.getName())){
+		for (City i : portals.values()) {
+			if (i.getName().equals(c.getName())) {
 				throw new DuplicatePortalNameThrowable();
 			}
 		}
-		
+
 		// Portal out of Bounds
 		if (!Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
 				new Rectangle2D.Float(spatialOrigin.x, spatialOrigin.y,
 						spatialWidth, spatialHeight))) {
 			throw new PortalOutOfBoundsThrowable();
 		}
-		
-		// TODO Create a new PMQuadtree for the level if it doesn't exist already
-		
+
+		// TODO Create a new PMQuadtree for the level if it doesn't exist
+		// already
+
 	}
-	
-	
+
 	// Adding a road
-	public void addRoad(Road r){
-		
+	public void addRoad(Road r) throws StartPointDoesNotExistThrowable,
+			EndPointDoesNotExistThrowable, StartEqualsEndThrowable,
+			RoadNotOnOneLevelThrowable, StartOrEndIsPortalThrowable,
+			RoadOutOfBoundsThrowable, RoadAlreadyExistsThrowable,
+			RoadIntersectsAnotherRoadThrowable, RoadViolatesPMRulesThrowable,
+			PortalViolatesPMRulesThrowable {
+
 		// startPointDoesNotExist
-		
+		if (citiesByName.containsKey(r.getStart().getName())) {
+			throw new StartPointDoesNotExistThrowable();
+		}
+
 		// endPointDoesNotExist
-		
+		if (citiesByName.containsKey(r.getEnd().getName())) {
+			throw new EndPointDoesNotExistThrowable();
+		}
+
 		// startEqualsEnd
-		
+		if (r.getStart().getName().equals(r.getEnd().getName())) {
+			throw new StartEqualsEndThrowable();
+		}
+
 		// roadNotOnOneLevel
-		
+		if (r.getStart().getZ() != r.getEnd().getZ()) {
+			throw new RoadNotOnOneLevelThrowable();
+		}
+
 		// startOrEndIsPortal
-		
+		for (City portal : portals.values()) {
+			if (r.getStart().getLocationString()
+					.equals(portal.getLocationString())) {
+				throw new StartOrEndIsPortalThrowable();
+			}
+			if (r.getEnd().getLocationString()
+					.equals(portal.getLocationString())) {
+				throw new StartOrEndIsPortalThrowable();
+			}
+		}
+
 		// roadOutOfBounds
-		
-		//TODO Create a new PMQuadtree for the level if it doesn't exist already
-		
-		// roadAlreadyMapped
+		Rectangle2D.Float world = new Rectangle2D.Float(spatialOrigin.x,
+				spatialOrigin.y, spatialWidth, spatialHeight);
+		if (!Inclusive2DIntersectionVerifier.intersects(r.toLine2D(), world)) {
+			throw new RoadOutOfBoundsThrowable();
+		}
+
+		// Create new level if it does not exist already
+		if (!levels.containsKey(r.getStart().getZ())) {
+			if (pmOrder == 1) {
+				PMQuadtree pmQuadtree = new PM1Quadtree(spatialWidth,
+						spatialHeight);
+				levels.put(r.getStart().getZ(), pmQuadtree);
+			} else {
+				PMQuadtree pmQuadtree = new PM3Quadtree(spatialWidth,
+						spatialHeight);
+				levels.put(r.getStart().getZ(), pmQuadtree);
+			}
+			// Portal value set to null for level
+			portals.put(r.getStart().getZ(), null);
+		}
+
+		// Adds road to PMQuadtree at specific level z
+		levels.get(r.getStart().getZ()).addRoad(r);
+
+		// Updates Adjacency List
+		if (Inclusive2DIntersectionVerifier.intersects(
+				r.getStart().toPoint2D(), world)
+				&& Inclusive2DIntersectionVerifier.intersects(r.getEnd()
+						.toPoint2D(), world)) {
+			// add to adjacency list
+			roads.addRoad(r.getStart(), r.getEnd());
+		}
 	}
 
 	// Creating a City
-	public void createCity(City c) throws DuplicateCityNameThrowable, DuplicateCityCoordinateThrowable{
-		
+	public void createCity(City c) throws DuplicateCityNameThrowable,
+			DuplicateCityCoordinateThrowable {
+
 		// City Name Conflicts with another city name
-		if (citiesByName.containsKey(c.getName())){
+		if (citiesByName.containsKey(c.getName())) {
 			throw new DuplicateCityNameThrowable();
 		}
-		
+
 		// City coordinate conflicts with another city coordinate
-		if (citiesByLocation.contains(c)){
+		if (citiesByLocation.contains(c)) {
 			throw new DuplicateCityCoordinateThrowable();
 		}
-		
+
 		// City name conflicts with a portal name
-		for (City portal : portals.values()){
-			if (portal.getName().equals(c.getName())){
+		for (City portal : portals.values()) {
+			if (portal.getName().equals(c.getName())) {
 				throw new DuplicateCityNameThrowable();
 			}
 		}
-		
+
 		// City coordinate conflicts with a portal coordinate
-		for (City portal : portals.values()){
-			if (portal.getLocationString().equals(c.getLocationString())){
+		for (City portal : portals.values()) {
+			if (portal.getLocationString().equals(c.getLocationString())) {
 				throw new DuplicateCityCoordinateThrowable();
 			}
 		}
-		
+
 		/* add city to dictionary */
 		citiesByName.put(c.getName(), c);
 		citiesByLocation.add(c);
 	}
-	
+
 	// Deleting a City
-	public void deleteCity(City c){
-		
+	public void deleteCity(City c) {
+
 		// cityDoesNotExist
 	}
-	
+
 	// Clear all, resets all of the structures
-	public void clearall(){
+	public void clearall() {
 
 	}
-	
+
 	// Delete Road
-	public void deleteRoad(Road r){
-		
+	public void deleteRoad(Road r) {
+
 	}
-	
+
 	// Deletes a portal
-	public void deletePortal(City c){
-		
+	public void deletePortal(City c) {
+
 	}
-	
+
 	// Prints quadtree at specific level
-	public void printPMQuadtree(int level){
-		
+	public void printPMQuadtree(int level) {
+
 	}
-	
+
 	// lists all the cities in a radius of a sphere (multilevel search)
-	public void rangeCities(){
-		
+	public void rangeCities() {
+
 	}
-	
-	// Lists all of the roads that are in the radius of a sphere (multilevel search)
-	public void rangeRoads(){
-		
+
+	// Lists all of the roads that are in the radius of a sphere (multilevel
+	// search)
+	public void rangeRoads() {
+
 	}
-	
-	// lists the closest city to a given point (NOT multilevelsearch) could disgard method
-	public void nearestCity(){
-		
+
+	// lists the closest city to a given point (NOT multilevelsearch) could
+	// disgard method
+	public void nearestCity() {
+
 	}
-	
+
 	// gets the shortest path from point a to b (multilevel navigation)
-	public void shortestPath(){
-		
+	public void shortestPath() {
+
 	}
-	
+
 	// Sweep, clears all of the marked deleted notes in AVL tree
-	public void sweep(){
-		
+	public void sweep() {
+
 	}
-	
+
 	// Lists all of the cities
-	public void listcities(){
-		
+	public void listcities() {
+
 	}
 }

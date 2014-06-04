@@ -39,6 +39,7 @@ import cmsc420.pmquadtree.DuplicateCityCoordinateThrowable;
 import cmsc420.pmquadtree.DuplicateCityNameThrowable;
 import cmsc420.pmquadtree.DuplicatePortalCoordinatesThrowable;
 import cmsc420.pmquadtree.DuplicatePortalNameThrowable;
+import cmsc420.pmquadtree.EndPointDoesNotExistThrowable;
 import cmsc420.pmquadtree.IsolatedCityAlreadyExistsThrowable;
 import cmsc420.pmquadtree.OutOfBoundsThrowable;
 import cmsc420.pmquadtree.PM3Quadtree;
@@ -52,7 +53,12 @@ import cmsc420.pmquadtree.PMQuadtree.Black;
 import cmsc420.pmquadtree.PMQuadtree.Gray;
 import cmsc420.pmquadtree.PMQuadtree.Node;
 import cmsc420.pmquadtree.RoadIntersectsAnotherRoadThrowable;
+import cmsc420.pmquadtree.RoadNotOnOneLevelThrowable;
+import cmsc420.pmquadtree.RoadOutOfBoundsThrowable;
 import cmsc420.pmquadtree.RoadViolatesPMRulesThrowable;
+import cmsc420.pmquadtree.StartEqualsEndThrowable;
+import cmsc420.pmquadtree.StartOrEndIsPortalThrowable;
+import cmsc420.pmquadtree.StartPointDoesNotExistThrowable;
 import cmsc420.sortedmap.GuardedAvlGTree;
 import cmsc420.sortedmap.StringComparator;
 import cmsc420.xml.XmlUtility;
@@ -430,51 +436,62 @@ First, the new road should not intersect any road already mapped at a point othe
 
 		final Element outputNode = results.createElement("output");
 
-		if (!l.citiesByName.containsKey(start)) {
-			addErrorNode("startPointDoesNotExist", commandNode, parametersNode);
-		} else if (!l.citiesByName.containsKey(end)) {
+		Rectangle2D.Float world = new Rectangle2D.Float(l.spatialOrigin.x,
+				l.spatialOrigin.y, l.spatialWidth, l.spatialHeight);
+
+		
+		Road newRoad = new Road((City) l.citiesByName.get(start),
+				(City) l.citiesByName.get(end));
+		
+	
+		try {
+			// add to spatial structure
+			//pmQuadtree.addRoad(new Road((City) l.citiesByName.get(start),
+			//		(City) l.citiesByName.get(end)));
+			
+			l.addRoad(newRoad);
+
+			// 
+//			if (Inclusive2DIntersectionVerifier.intersects(l.citiesByName
+//					.get(start).toPoint2D(), world)
+//					&& Inclusive2DIntersectionVerifier.intersects(
+//							l.citiesByName.get(end).toPoint2D(),
+//							world)) {
+//				// add to adjacency list
+//				l.roads.addRoad((City) l.citiesByName.get(start),
+//						(City) l.citiesByName.get(end));
+//			}
+			// create roadCreated element
+			final Element roadCreatedNode = results
+					.createElement("roadCreated");
+			roadCreatedNode.setAttribute("start", start);
+			roadCreatedNode.setAttribute("end", end);
+			outputNode.appendChild(roadCreatedNode);
+			// add success node to results
+			addSuccessNode(commandNode, parametersNode, outputNode);
+	
+		} catch (RoadAlreadyExistsThrowable e) {
+			addErrorNode("roadAlreadyMapped", commandNode, parametersNode);
+		} catch (EndPointDoesNotExistThrowable e) {
 			addErrorNode("endPointDoesNotExist", commandNode, parametersNode);
-		} else if (start.equals(end)) {
+		} catch (StartPointDoesNotExistThrowable e) {
+			addErrorNode("startPointDoesNotExist", commandNode, parametersNode);
+		} catch (StartEqualsEndThrowable e) {
 			addErrorNode("startEqualsEnd", commandNode, parametersNode);
-		} else {
-			try {
-				// add to spatial structure
-				pmQuadtree.addRoad(new Road((City) l.citiesByName.get(start),
-						(City) l.citiesByName.get(end)));
-				if (Inclusive2DIntersectionVerifier.intersects(l.citiesByName
-						.get(start).toPoint2D(), new Rectangle2D.Float(0, 0,
-						l.spatialWidth, l.spatialHeight))
-						&& Inclusive2DIntersectionVerifier.intersects(
-								l.citiesByName.get(end).toPoint2D(),
-								new Rectangle2D.Float(0, 0, l.spatialWidth,
-										l.spatialHeight))) {
-					// add to adjacency list
-					l.roads.addRoad((City) l.citiesByName.get(start),
-							(City) l.citiesByName.get(end));
-				}
-				// create roadCreated element
-				final Element roadCreatedNode = results
-						.createElement("roadCreated");
-				roadCreatedNode.setAttribute("start", start);
-				roadCreatedNode.setAttribute("end", end);
-				outputNode.appendChild(roadCreatedNode);
-				// add success node to results
-				addSuccessNode(commandNode, parametersNode, outputNode);
-			} catch (IsolatedCityAlreadyExistsThrowable e) {
-				addErrorNode("startOrEndIsIsolated", commandNode,
-						parametersNode);
-			} catch (RoadAlreadyExistsThrowable e) {
-				addErrorNode("roadAlreadyMapped", commandNode, parametersNode);
-			} catch (OutOfBoundsThrowable e) {
-				addErrorNode("roadOutOfBounds", commandNode, parametersNode);
-			} catch (RoadIntersectsAnotherRoadThrowable e){
-				addErrorNode("roadIntersectsAnotherRoad", commandNode, parametersNode);
-			} catch (RoadViolatesPMRulesThrowable e){
-				addErrorNode("roadViolatesPMRules", commandNode, parametersNode);
-			} catch (PortalViolatesPMRulesThrowable e){
-				addErrorNode("portalViolatesPMRules", commandNode, parametersNode);
-			}
+		} catch (RoadNotOnOneLevelThrowable e) {
+			addErrorNode("roadNotOnOneLevel", commandNode, parametersNode);
+		} catch (StartOrEndIsPortalThrowable e) {
+			addErrorNode("startOrEndIsPortal", commandNode, parametersNode);
+		} catch (RoadOutOfBoundsThrowable e) {
+			addErrorNode("roadOutOfBounds", commandNode, parametersNode);
+		} catch (RoadIntersectsAnotherRoadThrowable e){
+			addErrorNode("roadIntersectsAnotherRoad", commandNode, parametersNode);
+		} catch (RoadViolatesPMRulesThrowable e){
+			addErrorNode("roadViolatesPMRules", commandNode, parametersNode);
+		} catch (PortalViolatesPMRulesThrowable e){
+			addErrorNode("portalViolatesPMRules", commandNode, parametersNode);
 		}
+		
 	}
 	
 
@@ -885,9 +902,11 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
 		final Element outputNode = results.createElement("output");
-		final String z = processStringAttribute(node, "z", parametersNode);
+		final int z = processIntegerAttribute(node, "z", parametersNode);
 
-		if (pmQuadtree.isEmpty()) {
+		PMQuadtree pmQuadtree = l.levels.get(z);
+		
+		if (pmQuadtree == null || pmQuadtree.isEmpty()) {
 			/* empty PR Quadtree */
 			addErrorNode("levelIsEmpty", commandNode, parametersNode);
 			

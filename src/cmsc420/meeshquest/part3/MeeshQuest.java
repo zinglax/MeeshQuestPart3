@@ -27,7 +27,7 @@ public class MeeshQuest {
 	private File xmlOutput = new File("test1.txt");
 
 	// Converted part 2 tests
-//	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
+	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
 //	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
 //	private File xmlInput = new File("MasterInput.xml");
 //	private File xmlInput = new File("MasterRange.xml");
@@ -52,7 +52,7 @@ public class MeeshQuest {
 
 	// Part 3 Student Tests
 //	private File xmlInput = new File("part3.danzou.insertDelete.xml");
-	private File xmlInput = new File("pm1_insert_delete.xml");
+//	private File xmlInput = new File("pm1_insert_delete.xml");
 	
 	
     /* output DOM Document tree */
