@@ -261,7 +261,20 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 	 */
 	// TODO 
 	public void processDeleteCity(final Element node){
-		
+		final Element commandNode = getCommandNode(node);
+		final Element parametersNode = results.createElement("parameters");
+		final Element outputNode = results.createElement("output");
+
+		/* extract attribute values from command */
+		final String city_name = processStringAttribute(node, "name", parametersNode);
+
+		if (l.citiesByName.containsKey(city_name)){
+			City c = l.citiesByName.get(city_name);
+			l.levels.get(c.getZ()).remove(c);
+		} else {
+			addErrorNode("cityDoesNotExist", commandNode, parametersNode);
+
+		}
 	}
 
 	/**
@@ -312,10 +325,7 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 		final Element outputNode = results.createElement("output");
 
 		/* clear data structures */
-		l.citiesByName.clear();
-		l.citiesByLocation.clear();
-		pmQuadtree.clear();
-		l.roads.clear();
+		l.clearall();
 
 		/* clear canvas */
 		// canvas.clear();
@@ -437,19 +447,15 @@ First, the new road should not intersect any road already mapped at a point othe
 		final Element outputNode = results.createElement("output");
 
 		Rectangle2D.Float world = new Rectangle2D.Float(l.spatialOrigin.x,
-				l.spatialOrigin.y, l.spatialWidth, l.spatialHeight);
-
-		
-		Road newRoad = new Road((City) l.citiesByName.get(start),
-				(City) l.citiesByName.get(end));
-		
+				l.spatialOrigin.y, l.spatialWidth, l.spatialHeight);	
 	
 		try {
 			// add to spatial structure
 			//pmQuadtree.addRoad(new Road((City) l.citiesByName.get(start),
 			//		(City) l.citiesByName.get(end)));
+
 			
-			l.addRoad(newRoad);
+			l.addRoad(start, end);
 
 			// 
 //			if (Inclusive2DIntersectionVerifier.intersects(l.citiesByName
@@ -544,9 +550,10 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 		final int z = processIntegerAttribute(node, "z", parametersNode);
 		
 		City newPort = new City(name, x, y, z);
+		newPort.setPortal(true);
 		
 		try {
-			pmQuadtree.addPortal(newPort);
+			l.addPortal(newPort);
 			/* add success node to results */
 			addSuccessNode(commandNode, parametersNode, outputNode);
 		} catch (PortalViolatesPMRulesThrowable e){
@@ -904,7 +911,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final Element outputNode = results.createElement("output");
 		final int z = processIntegerAttribute(node, "z", parametersNode);
 
-		PMQuadtree pmQuadtree = l.levels.get(z);
+		pmQuadtree = l.levels.get(z);
 		
 		if (pmQuadtree == null || pmQuadtree.isEmpty()) {
 			/* empty PR Quadtree */
@@ -998,12 +1005,16 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final int radius = processIntegerAttribute(node, "radius",
 				parametersNode);
 
+		pmQuadtree = l.levels.get(z);
+
+		
+		
 		String pathFile = "";
 		if (!node.getAttribute("saveMap").equals("")) {
 			pathFile = processStringAttribute(node, "saveMap", parametersNode);
 		}
 
-		if (radius == 0) {
+		if (radius == 0 || pmQuadtree == null) {
 			addErrorNode("noCitiesExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> citiesInRange = new TreeSet<Geometry>();
@@ -1053,13 +1064,15 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final int z = processIntegerAttribute(node, "z", parametersNode);
 		final int radius = processIntegerAttribute(node, "radius",
 				parametersNode);
+		
+		pmQuadtree = l.levels.get(z);
 
 		String pathFile = "";
 		if (!node.getAttribute("saveMap").equals("")) {
 			pathFile = processStringAttribute(node, "saveMap", parametersNode);
 		}
 
-		if (radius == 0) {
+		if (pmQuadtree == null || radius == 0) {
 			addErrorNode("noRoadsExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> roadsInRange = new TreeSet<Geometry>();
@@ -1148,10 +1161,12 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		final int y = processIntegerAttribute(node, "y", parametersNode);
 		final int z = processIntegerAttribute(node, "z", parametersNode);
 
+		pmQuadtree = l.levels.get(z);
+
 
 		final Point2D.Float point = new Point2D.Float(x, y);
 
-		if (pmQuadtree.getNumCities() - pmQuadtree.getNumIsolatedCities() == 0) {
+		if (pmQuadtree == null || pmQuadtree.getNumCities() - pmQuadtree.getNumIsolatedCities() == 0) {
 			addErrorNode("cityNotFound", commandNode, parametersNode);
 		} else {
 			addCityNode(outputNode, nearestCityHelper(point, false));

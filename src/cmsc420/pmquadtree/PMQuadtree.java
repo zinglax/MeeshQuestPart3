@@ -16,13 +16,15 @@ import cmsc420.geometry.RoadNameComparator;
 public abstract class PMQuadtree {
 
 	/** stores all mapped roads in the PM Quadtree */
-	final protected TreeSet<Road> allRoads;
+	public final TreeSet<Road> allRoads;
 
 	/** stores how many roads are connected to each city */
 	final protected HashMap<String, Integer> numRoadsForCity;
 
 	/** number of Portals */
 	protected int numIsolatedCities;
+	
+	protected boolean hasPortal = false;
 
 	/** root of the PM Quadtree */
 	protected Node root;
@@ -269,7 +271,24 @@ public abstract class PMQuadtree {
 				return this;
 			} else {
 				/* invalid so partition into a Gray node */
-				Node newGray = partition(origin, width, height);
+				Node newGray = white;
+				try {
+					newGray = partition(origin, width, height);
+				} catch (RoadViolatesPMRulesThrowable e) {
+					if (g.isRoad()) {
+						throw new RoadViolatesPMRulesThrowable();
+					} else {
+						throw new PortalViolatesPMRulesThrowable();
+					}
+				} catch (PortalViolatesPMRulesThrowable e) {
+					if (g.isRoad()) {
+						throw new RoadViolatesPMRulesThrowable();
+					} else {
+						throw new PortalViolatesPMRulesThrowable();
+					}
+				}
+				
+				
 				if (!newGray.isValid()) {
 					PMQuadtree.this.remove(g);
 
@@ -377,7 +396,7 @@ public abstract class PMQuadtree {
 			// to black.add()
 			for (int i = 0; i < numPoints; i++) {
 				final Geometry g = geometry.get(i);
-				if (isIsolatedCity(g)) {
+				if (((City)g).isPortal()) {
 					gray = gray.add(g, origin, width, height);
 				}
 			}
@@ -386,6 +405,12 @@ public abstract class PMQuadtree {
 				final Geometry g = geometry.get(i);
 				gray = gray.add(g, origin, width, height);
 			}
+			
+//			for (int i = 0; i < geometry.size(); i++){
+//				final Geometry g = geometry.get(i);
+//				gray = gray.add(g, origin, width, height);
+//			}
+			
 			return gray;
 		}
 
@@ -793,7 +818,7 @@ public abstract class PMQuadtree {
 		}
 
 		// Already a portal on this level
-		if (numIsolatedCities > 0){
+		if (hasPortal){
 			throw new RedundantPortalThrowable();
 		}
 		
@@ -821,10 +846,12 @@ public abstract class PMQuadtree {
 			}
 		}
 		
-		numIsolatedCities++;
-		numRoadsForCity.put(c.getName(), 0);
+		//numIsolatedCities++;
 
-		root = root.add(c, spatialOrigin, spatialWidth, spatialHeight);		
+		root = root.add(c, spatialOrigin, spatialWidth, spatialHeight);	
+		numRoadsForCity.put(c.getName(), 0);
+		hasPortal = true;
+
 	}
 
 	public void addIsolatedCity(final City c)

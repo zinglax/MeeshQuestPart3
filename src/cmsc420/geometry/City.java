@@ -33,6 +33,17 @@ public class City extends Geometry {
 	
 	/** level of city **/
 	protected float z;
+	
+	/** Is Portal **/
+	protected boolean isPortal = false;
+
+	public boolean isPortal() {
+		return isPortal;
+	}
+
+	public void setPortal(boolean isPortal) {
+		this.isPortal = isPortal;
+	}
 
 	/**
 	 * Constructs a city.

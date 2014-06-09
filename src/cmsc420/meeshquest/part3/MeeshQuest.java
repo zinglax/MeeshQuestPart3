@@ -20,14 +20,14 @@ public class MeeshQuest {
 	
 	
 	/* input stream/file */
-	//private final InputStream xmlInput = System.in;
+	private final InputStream xmlInput = System.in;
 	
 	
 	// UNCOMMENT THIS TO TEST WITH FILES
-	private File xmlOutput = new File("test1.txt");
+//	private File xmlOutput = new File("test1.txt");
 
 	// Converted part 2 tests
-	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
+//	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
 //	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
 //	private File xmlInput = new File("MasterInput.xml");
 //	private File xmlInput = new File("MasterRange.xml");
@@ -105,16 +105,16 @@ public class MeeshQuest {
             try {
             	
             	// UNCOMMENT THIS TO TEST WITH FILES
-				XmlUtility.write(results, xmlOutput);
+				//XmlUtility.write(results, xmlOutput);
             	
                 XmlUtility.print(results);
             } catch (TransformerException e) {
                 System.exit(-1);
             }
-			// UNCOMMENT THIS TO TEST WITH FILES
-			 catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+//			// UNCOMMENT THIS TO TEST WITH FILES
+//			 catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
         }
     }
 
@@ -136,6 +136,8 @@ public class MeeshQuest {
             command.processCommands(commandNode);
         } else if (name.equals("createCity")) {
             command.processCreateCity(commandNode);
+        }else if (name.equals("deleteCity")) {
+            command.processDeleteCity(commandNode);
         } else if (name.equals("clearAll")) {
             command.processClearAll(commandNode);
         } else if (name.equals("listCities")) {
