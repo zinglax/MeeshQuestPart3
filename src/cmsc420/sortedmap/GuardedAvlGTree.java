@@ -44,7 +44,12 @@ public class GuardedAvlGTree<K, V> extends AvlGTree<K, V> {
     }
     @Override
     public V remove(Object key) {
-        throw new UnsupportedOperationException();
+    	final V ret = super.remove(key);
+    	final V correctVal = guard.remove(key);
+    	if (shouldWarn && ret != correctVal) // Object equality is sufficient
+            System.err.println("My map said " + ret + " instead of " + correctVal);
+        return correctVal; // Save yourself
+
     }
     @Override
     public int size() {

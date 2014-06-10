@@ -47,6 +47,10 @@ public abstract class PMQuadtree {
 	/** order of the PM Quadtree (one of: {1,2,3}) */
 	final protected int order;
 
+	public HashMap<String, Integer> getNumRoadsForCity(){
+		return this.numRoadsForCity;
+	}
+	
 	public abstract class Node {
 		/** Type flag for an empty PM Quadtree leaf node */
 		public static final int WHITE = 0;
@@ -78,6 +82,8 @@ public abstract class PMQuadtree {
 		public int getType() {
 			return type;
 		}
+		
+
 
 		/**
 		 * Adds a road to this PM Quadtree node.
@@ -310,10 +316,15 @@ public abstract class PMQuadtree {
 		 */
 		public Node remove(final Geometry g, final Point2D.Float origin,
 				final int width, final int height) {
-			// decrements point count
-			if (g.isCity())
-				numPoints--;
-
+			// decrements point count or removes the road from allroads
+			if (g.isCity()){
+				numPoints--; 
+				
+			} else {
+				allRoads.remove((Road) g);
+				decreaseNumRoadsMap(((Road)g).getStart().getName());
+				decreaseNumRoadsMap(((Road)g).getEnd().getName());
+			}
 			// removes geometry from list
 			geometry.remove(g);
 
@@ -557,20 +568,19 @@ public abstract class PMQuadtree {
 		public Node remove(final Geometry g, final Point2D.Float origin,
 				final int width, final int height) {
 
-			// Removes the geometry from children
-			if (g.isCity()) {
-				for (int i = 0; i < 4; i++) {
-					if (g.isRoad()
-							&& Inclusive2DIntersectionVerifier.intersects(
-									((Road) g).toLine2D(), regions[i])
-							|| g.isCity()
-							&& Inclusive2DIntersectionVerifier.intersects(
-									((City) g).toPoint2D(), regions[i])) {
-						children[i] = children[i].remove(g, origins[i],
-								halfWidth, halfHeight);
-					}
+			// Removes the geometry from children			
+			for (int i = 0; i < 4; i++) {
+				if (g.isRoad()
+						&& Inclusive2DIntersectionVerifier.intersects(
+								((Road) g).toLine2D(), regions[i])
+						|| g.isCity()
+						&& Inclusive2DIntersectionVerifier.intersects(
+								((City) g).toPoint2D(), regions[i])) {
+					children[i] = children[i].remove(g, origins[i],
+							halfWidth, halfHeight);
 				}
 			}
+			
 
 			int whiteCount = 0;
 			// Count White children
@@ -598,7 +608,8 @@ public abstract class PMQuadtree {
 				if (children[i].type == Node.GRAY)
 					grayCount++;
 			}
-
+			
+			// Not all gray, tries to put all geometries in a single black node
 			if (grayCount != 4) {
 				Black b = new Black();
 				b = addAllGeometries(b, this);
@@ -849,7 +860,7 @@ public abstract class PMQuadtree {
 		//numIsolatedCities++;
 
 		root = root.add(c, spatialOrigin, spatialWidth, spatialHeight);	
-		numRoadsForCity.put(c.getName(), 0);
+		//numRoadsForCity.put(c.getName(), 0);
 		hasPortal = true;
 
 	}
@@ -885,6 +896,18 @@ public abstract class PMQuadtree {
 			numRoadsForCity.put(name, numRoads);
 		} else {
 			numRoadsForCity.put(name, 1);
+		}
+	}
+	
+	private void decreaseNumRoadsMap(final String name) {
+		Integer numRoads = numRoadsForCity.get(name);
+		if (numRoads != null) {
+			numRoads--;
+			numRoadsForCity.put(name, numRoads);
+		 
+			if (numRoads < 0){
+				numRoadsForCity.remove(name);
+			}
 		}
 	}
 
@@ -948,15 +971,49 @@ public abstract class PMQuadtree {
 		if (!g.isCity()) {
 			return false;
 		}
-		City c = (City) g;
-		Integer n = numRoadsForCity.get(c.getName());
-		if (n == null || n > 0) {
+		
+		if (((City)g).isPortal()){
 			return false;
 		}
+		
+		City c = (City) g;
+		Integer n = numRoadsForCity.get(c.getName());
+		if (n == null) {
+			return true;
+		}
+		
+		if (n > 0){
+			return false;
+		}
+		
 		return true;
 	}
 
 	public void remove(Geometry g) {
-		root.remove(g, spatialOrigin, spatialWidth, spatialHeight);
+		root = root.remove(g, spatialOrigin, spatialWidth, spatialHeight);
 	}
+	
+	// Removes a City From the PMQuadtree
+	public void removeCity(City c) {
+		root = root.remove(c, spatialOrigin, spatialWidth, spatialHeight);
+	}
+	
+	// Removes a road from the PMQuadtree
+	public void removeRoad(Road r){
+		
+	}
+	
+	// Removes a portal from the PMQuadtree
+	public void removePortal(City c){
+		if (!c.isPortal()){
+			System.out.println("THIS IS NOT A PORTAL");
+		}
+		hasPortal = false;
+		
+		root = root.remove(c, spatialOrigin, spatialWidth, spatialHeight);
+		
+	}
+	
+
+	
 }

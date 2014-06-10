@@ -118,7 +118,15 @@ public class AvlGTree<K, V> extends AbstractMap<K, V> implements
     }
 
     public V remove(Object key) {
-        throw new UnsupportedOperationException();
+    	
+    	if (key == null)
+    		throw new NullPointerException();
+    	
+    	AvlNode<K,V> p = getNode(key);
+    	if (p != null){
+    		p.setDeleted(true);
+    	}
+    	return (p == null ? null : p.value);
     }
 
     public K firstKey() {
@@ -165,6 +173,7 @@ public class AvlGTree<K, V> extends AbstractMap<K, V> implements
         Comparator<? super K> comparator;
         private int leftHeight;
         private int rightHeight;
+        private boolean isDeleted;
 
         AvlNode(K key, V value, Comparator<? super K> comp) {
             this.key = key;
@@ -173,6 +182,7 @@ public class AvlGTree<K, V> extends AbstractMap<K, V> implements
             this.comparator = comp;
             this.leftHeight = 0;
             this.rightHeight = 0;
+            this.isDeleted = false;
         }
 
         public V add(AvlNode<K, V> node) {
@@ -274,6 +284,15 @@ public class AvlGTree<K, V> extends AbstractMap<K, V> implements
             }
             return e;
         }
+
+		
+        public boolean isDeleted() {
+			return isDeleted;
+		}
+
+		public void setDeleted(boolean isDeleted) {
+			this.isDeleted = isDeleted;
+		}
     }
 
     private final AvlNode<K, V> getNode(Object key) {

@@ -45,7 +45,10 @@ public class Leveler {
 	public Validator validator;
 	public int pmOrder;
 
+	// USING HASHMAP FOR TESTING PURPOSES
+	//public HashMap<String, City> citiesByName;
 	public GuardedAvlGTree<String, City> citiesByName;
+	
 	public TreeSet<City> citiesByLocation = new TreeSet<City>(
 			new CityLocationComparator());
 
@@ -63,6 +66,9 @@ public class Leveler {
 		this.spatialWidth = spatialWidth;
 		this.spatialHeight = spatialHeight;
 		this.pmOrder = pmOrder;
+		
+		// USING HASHMAP FOR TESTING PURPOSES
+		//this.citiesByName = new HashMap<String, City>();
 		this.citiesByName = new GuardedAvlGTree<String, City>(
 				new StringComparator(), avlOrder);
 
@@ -109,28 +115,6 @@ public class Leveler {
 				throw new DuplicatePortalCoordinatesThrowable();
 			}
 		}
-		
-		
-//		for (PMQuadtree qtree : levels.values()){
-//			// Check if Portal Intersects any Geometries already mapped
-//			for (Road r : qtree.allRoads) {
-//				// Portal Intersects Start City
-//				if (Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
-//						r.getStart().toPoint2D())){
-//					throw new DuplicatePortalCoordinatesThrowable();
-//				}
-//				// Portal Intersects End City
-//				if (Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
-//						r.getEnd().toPoint2D())){
-//					throw new DuplicatePortalCoordinatesThrowable();
-//				}
-//				// Portal Intersects Road
-//				if (Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
-//						r.toLine2D())){
-//					throw new PortalIntersectsRoadThrowable();
-//				}
-//			}
-//		}
 
 		// Portal out of Bounds
 		if (!Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
@@ -150,7 +134,7 @@ public class Leveler {
 						spatialHeight);
 				levels.put(c.getZ(), pmQuadtree);
 			}
-			// Portal value set to null for level
+			// Sets portal value to null for now, need to make sure that it can be added properly
 			portals.put(c.getZ(), null);
 		}
 

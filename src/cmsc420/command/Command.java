@@ -269,12 +269,47 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 		final String city_name = processStringAttribute(node, "name", parametersNode);
 
 		if (l.citiesByName.containsKey(city_name)){
+			// Gets the city
 			City c = l.citiesByName.get(city_name);
+			
+			addCityNode(outputNode,"cityUnmapped", c);
+			
+			// Removes the city from the quadtree
 			l.levels.get(c.getZ()).remove(c);
+			
+			// Removes all of the roads for the city
+			for (Road r : l.roads.getRoadSet(c)){
+				l.levels.get(c.getZ()).remove(r);
+				addRoadNode(outputNode, "roadUnmapped", r);
+				
+			}
+			
+			// Removes the city from the adjacency list
+			l.roads.removeRoadsForCity(c);
+			
+			// Removes the city from cities by name
+			l.citiesByName.remove(c.getName());
+			
+			// Removes the city from cities by location
+			l.citiesByLocation.remove(c);
+			
+			
+			addSuccessNode(commandNode, parametersNode, outputNode);
+			
+			// Removes any isolated cities created from prior removal
+			for (City city : l.citiesByLocation){
+				if (l.levels.get(city.getZ()) != null){
+					if (l.levels.get(city.getZ()).isIsolatedCity(city) && !city.isPortal()){
+						l.levels.get(city.getZ()).remove(city);
+					}
+				}
+			}
+
 		} else {
 			addErrorNode("cityDoesNotExist", commandNode, parametersNode);
 
-		}
+		}	
+
 	}
 
 	/**
@@ -500,8 +535,6 @@ First, the new road should not intersect any road already mapped at a point othe
 		
 	}
 	
-
-	
 	/**
 	 * Removes a road and its associated endpoints from the map unless the endpoint (city) is part of another mapped road.
 	 * @param node
@@ -517,7 +550,23 @@ First, the new road should not intersect any road already mapped at a point othe
 	 */
 	// TODO portalDoesNotExist
 	public void processUnmapPortal(Element node){
-		
+		final Element commandNode = getCommandNode(node);
+		final Element parametersNode = results.createElement("parameters");
+		final Element outputNode = results.createElement("output");
+
+		/* extract attribute values from command */
+		final String portal_name = processStringAttribute(node, "name", parametersNode);
+
+		for (City c : l.portals.values()){
+			if (c.getName().equals(portal_name)){
+				l.levels.get(c.getZ()).removePortal(c);
+				
+				addSuccessNode(commandNode, parametersNode, outputNode);
+				l.portals.remove(c.getZ());
+				return;
+			}
+		}
+		addErrorNode("portalDoesNotExist", commandNode, parametersNode);
 	}
 	
     public void processPrintAvlTree(Element node) {
@@ -554,6 +603,9 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 		
 		try {
 			l.addPortal(newPort);
+			
+			l.portals.put(newPort.getZ(), newPort);
+			
 			/* add success node to results */
 			addSuccessNode(commandNode, parametersNode, outputNode);
 		} catch (PortalViolatesPMRulesThrowable e){
@@ -772,7 +824,6 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		}
 	}
 	
-	
 	private void saveShortestPathMap(final String mapName,
 			final List<City> cityList) throws IOException {
 		final CanvasPlus map = new CanvasPlus();
@@ -952,15 +1003,24 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 			for (Geometry g : currentLeaf.getGeometry()) {
 				if (g.isCity()) {
 					City c = (City) g;
-					Element city = results.createElement(pmQuadtree
-							.isIsolatedCity(c) ? "isolatedCity" : "city");
+					
+					Element city;
+					
+					if (c.isPortal()){
+						city = results.createElement("portal");
+						
+					} else {
+						city = results.createElement("city");
+						city.setAttribute("radius",
+								Integer.toString((int) c.getRadius()));
+						city.setAttribute("color", c.getColor());
+					}
+					
 					city.setAttribute("name", c.getName());
 					city.setAttribute("x", Integer.toString((int) c.getX()));
 					city.setAttribute("y", Integer.toString((int) c.getY()));
 					city.setAttribute("z", Integer.toString((int) c.getZ()));
-					city.setAttribute("radius",
-							Integer.toString((int) c.getRadius()));
-					city.setAttribute("color", c.getColor());
+
 					blackNode.appendChild(city);
 				} else {
 					City c1 = ((Road) g).getStart();

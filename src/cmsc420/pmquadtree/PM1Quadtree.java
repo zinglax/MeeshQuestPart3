@@ -20,6 +20,6 @@ public class PM1Quadtree extends PMQuadtree {
 	 *            height of the spatial map
 	 */
 	public PM1Quadtree(final int spatialWidth, final int spatialHeight) {
-		super(new PM3Validator(), spatialWidth, spatialHeight, 1);
+		super(new PM1Validator(), spatialWidth, spatialHeight, 1);
 	}
 }

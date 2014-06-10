@@ -20,11 +20,11 @@ public class MeeshQuest {
 	
 	
 	/* input stream/file */
-	private final InputStream xmlInput = System.in;
+	//private final InputStream xmlInput = System.in;
 	
 	
 	// UNCOMMENT THIS TO TEST WITH FILES
-//	private File xmlOutput = new File("test1.txt");
+	private File xmlOutput = new File("test1.txt");
 
 	// Converted part 2 tests
 //	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
@@ -51,8 +51,11 @@ public class MeeshQuest {
 //	private File xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
 	// Part 3 Student Tests
-//	private File xmlInput = new File("part3.danzou.insertDelete.xml");
+	private File xmlInput = new File("part3.danzou.insertDelete.xml");
 //	private File xmlInput = new File("pm1_insert_delete.xml");
+	
+	// Part 3 Dylan's Tests
+//	private File xmlInput = new File("dylanTests/dylan.simpleDelete.xml");
 	
 	
     /* output DOM Document tree */
@@ -105,16 +108,16 @@ public class MeeshQuest {
             try {
             	
             	// UNCOMMENT THIS TO TEST WITH FILES
-				//XmlUtility.write(results, xmlOutput);
+				XmlUtility.write(results, xmlOutput);
             	
                 XmlUtility.print(results);
             } catch (TransformerException e) {
                 System.exit(-1);
             }
-//			// UNCOMMENT THIS TO TEST WITH FILES
-//			 catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
+			// UNCOMMENT THIS TO TEST WITH FILES
+			 catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
         }
     }
 
@@ -150,6 +153,10 @@ public class MeeshQuest {
             command.processMapCity(commandNode);
         } else if (name.equals("mapPortal")) {
             command.processMapPortal(commandNode);
+        } else if (name.equals("unmapPortal")) {
+            command.processUnmapPortal(commandNode);
+        } else if (name.equals("unmapRoad")) {
+            command.processUnmapRoad(commandNode);
         } else if (name.equals("printPMQuadtree")) {
             command.processPrintPMQuadtree(commandNode);
         } else if (name.equals("saveMap")) {
