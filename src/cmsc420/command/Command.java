@@ -606,6 +606,8 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 			
 			l.portals.put(newPort.getZ(), newPort);
 			
+			//System.out.println(l.levels.get(z).isTreeValid());
+			
 			/* add success node to results */
 			addSuccessNode(commandNode, parametersNode, outputNode);
 		} catch (PortalViolatesPMRulesThrowable e){
@@ -897,7 +899,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 
 		final Element outputNode = results.createElement("output");
 
-		CanvasPlus canvas = drawPMQuadtree();
+		CanvasPlus canvas = drawPMQuadtree(node);
 
 		/* save canvas to '(name).png' */
 		canvas.save(name);
@@ -908,9 +910,16 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 		addSuccessNode(commandNode, parametersNode, outputNode);
 	}
 
-	private CanvasPlus drawPMQuadtree() {
+	private CanvasPlus drawPMQuadtree(final Element node) {
+		final Element commandNode = getCommandNode(node);
+		final Element parametersNode = results.createElement("parameters");
+
+		final int z = processIntegerAttribute(node, "z", parametersNode);
+
 		final CanvasPlus canvas = new CanvasPlus("MeeshQuest");
 
+		pmQuadtree = l.levels.get(z);
+		
 		/* initialize canvas */
 		canvas.setFrameSize(l.spatialWidth, l.spatialHeight);
 
@@ -1098,7 +1107,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 
 				if (pathFile.compareTo("") != 0) {
 					/* save canvas to file with range circle */
-					CanvasPlus canvas = drawPMQuadtree();
+					CanvasPlus canvas = drawPMQuadtree(node);
 					canvas.addCircle(x, y, radius, Color.BLUE, false);
 					canvas.save(pathFile);
 					canvas.dispose();
@@ -1155,7 +1164,7 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 
 				if (pathFile.compareTo("") != 0) {
 					/* save canvas to file with range circle */
-					CanvasPlus canvas = drawPMQuadtree();
+					CanvasPlus canvas = drawPMQuadtree(node);
 					canvas.addCircle(x, y, radius, Color.BLUE, false);
 					canvas.save(pathFile);
 					canvas.dispose();

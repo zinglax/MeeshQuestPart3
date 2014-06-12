@@ -18,6 +18,16 @@ import cmsc420.xml.XmlUtility;
 
 public class MeeshQuest {
 	
+	private File xmlInput;
+	
+	// Constructor 
+	public MeeshQuest(String testFile){
+		xmlInput = new File(testFile);
+	}
+	
+	public MeeshQuest(){
+		
+	}
 	
 	/* input stream/file */
 	//private final InputStream xmlInput = System.in;
@@ -33,6 +43,7 @@ public class MeeshQuest {
 //	private File xmlInput = new File("MasterRange.xml");
 //	private File xmlInput = new File("part2.dan.errortest1.xml");
 //	private File xmlInput = new File("part2.dan.errortest2.xml");
+//
 //	private File xmlInput = new File("part2.dan.nearestcity1.xml");
 //	private File xmlInput = new File("part2.dan.nearestcity2.xml");
 //	private File xmlInput = new File("part2.dan.shortestpath2.xml");
@@ -51,7 +62,7 @@ public class MeeshQuest {
 //	private File xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
 	// Part 3 Student Tests
-	private File xmlInput = new File("part3.danzou.insertDelete.xml");
+//	private File xmlInput = new File("part3.danzou.insertDelete.xml");
 //	private File xmlInput = new File("pm1_insert_delete.xml");
 	
 	// Part 3 Dylan's Tests

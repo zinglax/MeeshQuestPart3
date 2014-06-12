@@ -139,6 +139,13 @@ public class Leveler {
 		}
 
 		levels.get(c.getZ()).addPortal(c);
+				
+		// Checking if tree is valid
+		if (!levels.get(c.getZ()).isTreeValid()){
+			levels.get(c.getZ()).remove(c);
+			throw new PortalViolatesPMRulesThrowable();
+		}
+		
 
 	}
 
@@ -212,6 +219,12 @@ public class Leveler {
 
 		// Adds road to PMQuadtree at specific level z
 		levels.get(r.getStart().getZ()).addRoad(r);
+		
+		// Checking if tree is valid
+		if (!levels.get(r.getStart().getZ()).isTreeValid()){
+			levels.get(r.getStart().getZ()).remove(r);
+			throw new RoadViolatesPMRulesThrowable();
+		}
 
 		// Updates Adjacency List
 		if (Inclusive2DIntersectionVerifier.intersects(

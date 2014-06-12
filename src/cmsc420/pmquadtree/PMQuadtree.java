@@ -270,45 +270,52 @@ public abstract class PMQuadtree {
 			/* add the road or isolated city to the geometry list */
 			addGeometryToList(g);
 
-			// ][
-			/* check if this node is valid */
-			if (isValid()) {
-				/* valid so return this black node */
+//			
+			if (isValid()){
 				return this;
 			} else {
-				/* invalid so partition into a Gray node */
-				Node newGray = white;
-				try {
-					newGray = partition(origin, width, height);
-				} catch (RoadViolatesPMRulesThrowable e) {
-					if (g.isRoad()) {
-						throw new RoadViolatesPMRulesThrowable();
-					} else {
-						throw new PortalViolatesPMRulesThrowable();
-					}
-				} catch (PortalViolatesPMRulesThrowable e) {
-					if (g.isRoad()) {
-						throw new RoadViolatesPMRulesThrowable();
-					} else {
-						throw new PortalViolatesPMRulesThrowable();
-					}
-				}
-				
-				
-				if (!newGray.isValid()) {
-					PMQuadtree.this.remove(g);
-
-					if (g.isRoad()) {
-						throw new RoadViolatesPMRulesThrowable();
-					} else {
-						throw new PortalViolatesPMRulesThrowable();
-					}
-
-				} else {
-					return newGray;
-				}
-
+				return partition(origin, width, height);
 			}
+			
+//			// ][
+//			/* check if this node is valid */
+//			if (isValid()) {
+//				/* valid so return this black node */
+//				return this;
+//			} else {
+//				/* invalid so partition into a Gray node */
+//				Node newGray = white;
+//				try {
+//					newGray = partition(origin, width, height);
+//				} catch (RoadViolatesPMRulesThrowable e) {
+//					if (g.isRoad()) {
+//						throw new RoadViolatesPMRulesThrowable();
+//					} else {
+//						throw new PortalViolatesPMRulesThrowable();
+//					}
+//				} catch (PortalViolatesPMRulesThrowable e) {
+//					if (g.isRoad()) {
+//						throw new RoadViolatesPMRulesThrowable();
+//					} else {
+//						throw new PortalViolatesPMRulesThrowable();
+//					}
+//				}
+//				
+//				
+//				if (!newGray.isValid()) {
+//					PMQuadtree.this.remove(g);
+//
+//					if (g.isRoad()) {
+//						throw new RoadViolatesPMRulesThrowable();
+//					} else {
+//						throw new PortalViolatesPMRulesThrowable();
+//					}
+//
+//				} else {
+//					return newGray;
+//				}
+//
+//			}
 		}
 
 		/**
@@ -1015,5 +1022,8 @@ public abstract class PMQuadtree {
 	}
 	
 
+	public boolean isTreeValid(){
+		return root.isValid();
+	}
 	
 }

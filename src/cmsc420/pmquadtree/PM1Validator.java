@@ -40,9 +40,10 @@ public class PM1Validator implements Validator {
 				// if it does not contain the city it is not valid
 				if (!((Road) g).contains(node.getCity()))
 					return false;	
+			return true;
 		}
 		
-		return true;
+		return false;
 		
 	}
 	
