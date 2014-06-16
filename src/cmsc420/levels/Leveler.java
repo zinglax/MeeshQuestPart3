@@ -52,6 +52,8 @@ public class Leveler {
 	public TreeSet<City> citiesByLocation = new TreeSet<City>(
 			new CityLocationComparator());
 
+	public TreeSet<City> mappedCities = new TreeSet<City>();
+	
 	public RoadAdjacencyList roads = new RoadAdjacencyList();
 
 	// PM Quadtree associated with each level
@@ -142,6 +144,7 @@ public class Leveler {
 				
 		// Checking if tree is valid
 		if (!levels.get(c.getZ()).isTreeValid()){
+			levels.get(c.getZ()).setHasPortal(false);
 			levels.get(c.getZ()).remove(c);
 			throw new PortalViolatesPMRulesThrowable();
 		}

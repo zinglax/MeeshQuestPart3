@@ -19,55 +19,58 @@ import cmsc420.xml.XmlUtility;
 public class MeeshQuest {
 	
 	private File xmlInput;
-	
+	private File xmlOutput;
 	// Constructor 
 	public MeeshQuest(String testFile){
 		xmlInput = new File(testFile);
+		xmlOutput = new File("test1.txt");
 	}
 	
 	public MeeshQuest(){
 		
-	}
+	
 	
 	/* input stream/file */
 	//private final InputStream xmlInput = System.in;
 	
 	
 	// UNCOMMENT THIS TO TEST WITH FILES
-	private File xmlOutput = new File("test1.txt");
+	xmlOutput = new File("test1.txt");
 
 	// Converted part 2 tests
 //	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
 //	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
 //	private File xmlInput = new File("MasterInput.xml");
 //	private File xmlInput = new File("MasterRange.xml");
-//	private File xmlInput = new File("part2.dan.errortest1.xml");
+//	xmlInput = new File("part2.dan.errortest1.xml");
 //	private File xmlInput = new File("part2.dan.errortest2.xml");
 //
 //	private File xmlInput = new File("part2.dan.nearestcity1.xml");
 //	private File xmlInput = new File("part2.dan.nearestcity2.xml");
-//	private File xmlInput = new File("part2.dan.shortestpath2.xml");
-//	private File xmlInput = new File("part2.dan.shortestPaths.xml");
-//	private File xmlInput = new File("part2.dander.shortestErrors.xml");
-//	private File xmlInput = new File("part2.dander.testSpatialFunctions.xml");
-//	private File xmlInput = new File("part2.dean.shortestPath.xml");
-//	private File xmlInput = new File("part2.JaredBergman.errorTest.xml");
-//	private File xmlInput = new File("part2.reeve.roadOnEdge.input.xml");
-//	private File xmlInput = new File("pm_insert_rangeroads.input.xml");
-//	private File xmlInput = new File("printavl_printpm.xml");
-//	private File xmlInput = new File("rangeRoadsTest.xml");
+//	xmlInput = new File("part2.dan.shortestpath2.xml");
+//	xmlInput = new File("part2.dan.shortestPaths.xml");
+//	xmlInput = new File("part2.dander.shortestErrors.xml");
+//	xmlInput = new File("part2.dander.testSpatialFunctions.xml");
+//	xmlInput = new File("part2.dean.shortestPath.xml");
+//	xmlInput = new File("part2.JaredBergman.errorTest.xml");
+//	xmlInput = new File("part2.reeve.roadOnEdge.input.xml");
+//	xmlInput = new File("pm_insert_rangeroads.input.xml");
+//	xmlInput = new File("printavl_printpm.xml");
+//	xmlInput = new File("rangeRoadsTest.xml");
 	
 	// Part 3 Public tests
-//	private File xmlInput = new File("testfiles/part3.public.portal.input.xml");
-//	private File xmlInput = new File("testfiles/part3.public.primary.input.xml");
+//	xmlInput = new File("testfiles/part3.public.portal.input.xml");
+//	xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
 	// Part 3 Student Tests
-//	private File xmlInput = new File("part3.danzou.insertDelete.xml");
-//	private File xmlInput = new File("pm1_insert_delete.xml");
+	xmlInput = new File("part3.danzou.insertDelete.xml");
+//	xmlInput = new File("pm1_insert_delete.xml");
 	
 	// Part 3 Dylan's Tests
-//	private File xmlInput = new File("dylanTests/dylan.simpleDelete.xml");
+//	xmlInput = new File("dylanTests/dylan.simpleDelete.xml");
 	
+	
+	}
 	
     /* output DOM Document tree */
     private Document results;

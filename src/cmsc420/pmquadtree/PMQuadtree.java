@@ -26,6 +26,15 @@ public abstract class PMQuadtree {
 	
 	protected boolean hasPortal = false;
 
+	public boolean hasPortal() {
+		return hasPortal;
+	}
+
+	public void setHasPortal(boolean hasPortal) {
+		this.hasPortal = hasPortal;
+	}
+
+
 	/** root of the PM Quadtree */
 	protected Node root;
 

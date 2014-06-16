@@ -293,6 +293,8 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 			// Removes the city from cities by location
 			l.citiesByLocation.remove(c);
 			
+			// Removes the city from the mapped cities
+			l.mappedCities.remove(c);
 			
 			addSuccessNode(commandNode, parametersNode, outputNode);
 			
@@ -301,6 +303,9 @@ Possible side effect: other cities may be unmapped if the last road to them is r
 				if (l.levels.get(city.getZ()) != null){
 					if (l.levels.get(city.getZ()).isIsolatedCity(city) && !city.isPortal()){
 						l.levels.get(city.getZ()).remove(city);
+						l.citiesByLocation.remove(city);
+						l.citiesByName.remove(city.getName());
+						l.mappedCities.remove(city);
 					}
 				}
 			}
@@ -510,6 +515,9 @@ First, the new road should not intersect any road already mapped at a point othe
 			outputNode.appendChild(roadCreatedNode);
 			// add success node to results
 			addSuccessNode(commandNode, parametersNode, outputNode);
+			
+			l.mappedCities.add(l.citiesByName.get(start));
+			l.mappedCities.add(l.citiesByName.get(end));
 	
 		} catch (RoadAlreadyExistsThrowable e) {
 			addErrorNode("roadAlreadyMapped", commandNode, parametersNode);
@@ -641,6 +649,8 @@ There’s only one portal per z. Any others are redundant. No two portals, furth
 				pmQuadtree.addIsolatedCity(l.citiesByName.get(name));
 				/* add success node to results */
 				addSuccessNode(commandNode, parametersNode, outputNode);
+				
+				
 			} catch (RoadAlreadyExistsThrowable e) {
 				addErrorNode("cityAlreadyMapped", commandNode, parametersNode);
 			} catch (IsolatedCityAlreadyExistsThrowable e) {
@@ -676,6 +686,11 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 				parametersNode);
 		final String end = processStringAttribute(node, "end", parametersNode);
 
+		// TODO here for testing purposes
+		City startcity = l.citiesByName.get(start);
+		City endcity = l.citiesByName.get(end);
+		
+		
 		String saveMapName = "";
 		if (!node.getAttribute("saveMap").equals("")) {
 			saveMapName = processStringAttribute(node, "saveMap",
@@ -688,6 +703,22 @@ Hopping off-road from any mapped endpoint to the portal is technically possible.
 					parametersNode);
 		}
 		
+		
+		if (startcity == null || !l.mappedCities.contains(startcity)){
+			addErrorNode("nonExistentStart", commandNode, parametersNode);
+			return;
+		}
+
+		if (endcity == null || !l.mappedCities.contains(endcity)){
+			addErrorNode("nonExistentEnd", commandNode, parametersNode);
+			return;
+		}
+			
+		
+		pmQuadtree = l.levels.get(startcity.getZ());
+
+		
+
 		if (!pmQuadtree.containsCity(start)) {
 			addErrorNode("nonExistentStart", commandNode, parametersNode);
 		} else if (!pmQuadtree.containsCity(end)) {
