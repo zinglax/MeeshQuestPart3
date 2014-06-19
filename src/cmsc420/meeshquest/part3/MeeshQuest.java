@@ -18,6 +18,9 @@ import cmsc420.xml.XmlUtility;
 
 public class MeeshQuest {
 	
+	//private final InputStream xmlInput;
+	
+	
 	private File xmlInput;
 	private File xmlOutput;
 	// Constructor 
@@ -31,7 +34,7 @@ public class MeeshQuest {
 	
 	
 	/* input stream/file */
-	//private final InputStream xmlInput = System.in;
+//	xmlInput = System.in;
 	
 	
 	// UNCOMMENT THIS TO TEST WITH FILES

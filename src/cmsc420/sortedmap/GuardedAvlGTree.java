@@ -2,6 +2,7 @@ package cmsc420.sortedmap;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TreeMap;
     
 public class GuardedAvlGTree<K, V> extends AvlGTree<K, V> {
@@ -69,4 +70,11 @@ public class GuardedAvlGTree<K, V> extends AvlGTree<K, V> {
     public Collection<V> values() {
         return guard.values();
     }
+	@Override
+	public Set<K> keySet() {
+		// TODO Auto-generated method stub
+		return guard.keySet();
+	}
+    
+    
 }

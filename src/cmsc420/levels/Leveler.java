@@ -26,6 +26,7 @@ import cmsc420.pmquadtree.PortalViolatesPMRulesThrowable;
 import cmsc420.pmquadtree.RedundantPortalThrowable;
 import cmsc420.pmquadtree.RoadAlreadyExistsThrowable;
 import cmsc420.pmquadtree.RoadIntersectsAnotherRoadThrowable;
+import cmsc420.pmquadtree.RoadNotMappedThrowable;
 import cmsc420.pmquadtree.RoadNotOnOneLevelThrowable;
 import cmsc420.pmquadtree.RoadOutOfBoundsThrowable;
 import cmsc420.pmquadtree.RoadViolatesPMRulesThrowable;
@@ -46,14 +47,14 @@ public class Leveler {
 	public int pmOrder;
 
 	// USING HASHMAP FOR TESTING PURPOSES
-	//public HashMap<String, City> citiesByName;
+	// public HashMap<String, City> citiesByName;
 	public GuardedAvlGTree<String, City> citiesByName;
-	
+
 	public TreeSet<City> citiesByLocation = new TreeSet<City>(
 			new CityLocationComparator());
 
 	public TreeSet<City> mappedCities = new TreeSet<City>();
-	
+
 	public RoadAdjacencyList roads = new RoadAdjacencyList();
 
 	// PM Quadtree associated with each level
@@ -68,9 +69,9 @@ public class Leveler {
 		this.spatialWidth = spatialWidth;
 		this.spatialHeight = spatialHeight;
 		this.pmOrder = pmOrder;
-		
+
 		// USING HASHMAP FOR TESTING PURPOSES
-		//this.citiesByName = new HashMap<String, City>();
+		// this.citiesByName = new HashMap<String, City>();
 		this.citiesByName = new GuardedAvlGTree<String, City>(
 				new StringComparator(), avlOrder);
 
@@ -92,7 +93,7 @@ public class Leveler {
 
 		// Another Portal has the same coordinates
 		for (City i : portals.values()) {
-			if (i != null){
+			if (i != null) {
 				if (i.getLocationString().equals(c.getLocationString())) {
 					throw new DuplicatePortalCoordinatesThrowable();
 				}
@@ -101,27 +102,26 @@ public class Leveler {
 
 		// Another Portal has the same name
 		for (City i : portals.values()) {
-			if (i != null){
+			if (i != null) {
 				if (i.getName().equals(c.getName())) {
 					throw new DuplicatePortalNameThrowable();
 				}
 			}
 		}
-		
+
 		// Portal has same name or coordinates as existing city
-		for (City city : citiesByName.values()){
-			if (c.getName().equals(city.getName())){
+		for (City city : citiesByName.values()) {
+			if (c.getName().equals(city.getName())) {
 				throw new DuplicatePortalNameThrowable();
 			}
-			if (c.getLocationString().equals(city.getLocationString())){
+			if (c.getLocationString().equals(city.getLocationString())) {
 				throw new DuplicatePortalCoordinatesThrowable();
 			}
 		}
 
 		// Portal out of Bounds
 		if (!Inclusive2DIntersectionVerifier.intersects(c.toPoint2D(),
-				new Rectangle2D.Float(0, 0,
-						spatialWidth, spatialHeight))) {
+				new Rectangle2D.Float(0, 0, spatialWidth, spatialHeight))) {
 			throw new PortalOutOfBoundsThrowable();
 		}
 
@@ -136,19 +136,19 @@ public class Leveler {
 						spatialHeight);
 				levels.put(c.getZ(), pmQuadtree);
 			}
-			// Sets portal value to null for now, need to make sure that it can be added properly
+			// Sets portal value to null for now, need to make sure that it can
+			// be added properly
 			portals.put(c.getZ(), null);
 		}
 
 		levels.get(c.getZ()).addPortal(c);
-				
+
 		// Checking if tree is valid
-		if (!levels.get(c.getZ()).isTreeValid()){
+		if (!levels.get(c.getZ()).isTreeValid()) {
 			levels.get(c.getZ()).setHasPortal(false);
 			levels.get(c.getZ()).remove(c);
 			throw new PortalViolatesPMRulesThrowable();
 		}
-		
 
 	}
 
@@ -222,9 +222,9 @@ public class Leveler {
 
 		// Adds road to PMQuadtree at specific level z
 		levels.get(r.getStart().getZ()).addRoad(r);
-		
+
 		// Checking if tree is valid
-		if (!levels.get(r.getStart().getZ()).isTreeValid()){
+		if (!levels.get(r.getStart().getZ()).isTreeValid()) {
 			levels.get(r.getStart().getZ()).remove(r);
 			throw new RoadViolatesPMRulesThrowable();
 		}
@@ -272,12 +272,6 @@ public class Leveler {
 		citiesByLocation.add(c);
 	}
 
-	// Deleting a City
-	public void deleteCity(City c) {
-
-		// cityDoesNotExist
-	}
-
 	// Clear all, resets all of the structures
 	public void clearall() {
 		citiesByName.clear();
@@ -287,9 +281,52 @@ public class Leveler {
 		levels.clear();
 	}
 
-	// Delete Road
-	public void deleteRoad(Road r) {
+	// Removes a road and its associated endpoints from the map unless the
+	// endpoint (city) is part of another mapped road.
+	public Road unmapRoad(String startName, String endName)
+			throws StartPointDoesNotExistThrowable,
+			EndPointDoesNotExistThrowable, StartEqualsEndThrowable,
+			RoadNotMappedThrowable {
 
+		// startPointDoesNotExist
+		if (!citiesByName.containsKey(startName)) {
+			throw new StartPointDoesNotExistThrowable();
+		}
+
+		// endPointDoesNotExist
+		if (!citiesByName.containsKey(endName)) {
+			throw new EndPointDoesNotExistThrowable();
+		}
+
+		Road r = new Road((City) citiesByName.get(startName),
+				(City) citiesByName.get(endName));
+
+		// startEqualsEnd
+		if (r.getStart().getName().equals(r.getEnd().getName())) {
+			throw new StartEqualsEndThrowable();
+		}
+
+		if (!roads.containsRoad(r)) {
+			throw new RoadNotMappedThrowable();
+		}
+
+		// removes the road from the quadtree
+		levels.get(r.getStart().getZ()).remove(r);
+		
+		roads.removeRoad(r);
+		
+		if (roads.getRoadSet(r.getStart()).size() == 0){
+			levels.get(r.getStart().getZ()).remove(r.getStart());
+			mappedCities.remove(r.getStart());
+		}
+		
+		if (roads.getRoadSet(r.getEnd()).size() == 0){
+			levels.get(r.getEnd().getZ()).remove(r.getEnd());
+			mappedCities.remove(r.getEnd());
+		}
+		
+		
+		return r;
 	}
 
 	// Deletes a portal

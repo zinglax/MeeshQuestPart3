@@ -10,9 +10,9 @@ package cmsc420.geometry;
 import java.util.Comparator;
 
 /**
- * Compares two cities based on location of x and y coordinates. First compares
+ * Compares two cities based on location of x, y, and z coordinates. First compares
  * the x values of each {@link City}. If the x values are the same, then the y values of
- * each City are compared.
+ * each City are compared. then the Z!
  * 
  * @author Ben Zoller
  * @version 1.0, 23 Jan 2007
@@ -32,7 +32,13 @@ public class CityLocationComparator implements Comparator<City> {
 				return 1;
 			} else {
 				/* one.getY() == two.getY() */
-				return 0;
+				if (one.getZ() < two.getZ()){
+					return -1;
+				} else if (one.getZ() > two.getZ()){
+					return 1;
+				} else {
+					return 0;	
+				}				
 			}
 		}
 	}

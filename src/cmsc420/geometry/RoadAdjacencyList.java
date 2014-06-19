@@ -209,8 +209,12 @@ public class RoadAdjacencyList {
 	 */
 	public TreeSet<Road> deleteCity(final City city) {
 		final String cityName = city.getName();
-		final TreeSet<Road> roadsForCity = adjacencyList.remove(city);
+		TreeSet<Road> roadsForCity = adjacencyList.remove(city);
 
+		if (roadsForCity == null){
+			roadsForCity = new TreeSet<Road>();
+		}
+		
 		for (Road road : roadsForCity) {
 			// remove the road from the TreeSet of the City other than city
 			final City otherCity = road.getOtherCity(cityName);
