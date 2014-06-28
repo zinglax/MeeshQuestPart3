@@ -220,12 +220,24 @@ public class Leveler {
 			portals.put(r.getStart().getZ(), null);
 		}
 
+		PMQuadtree old;
+		
+		if (pmOrder == 1 ){
+			old = new PM1Quadtree();
+			levels.get(r.getStart().getZ()).copy(old);
+		} else {
+			old = new PM3Quadtree();
+			levels.get(r.getStart().getZ()).copy(old);
+		}
+		
+		
 		// Adds road to PMQuadtree at specific level z
 		levels.get(r.getStart().getZ()).addRoad(r);
 
 		// Checking if tree is valid
 		if (!levels.get(r.getStart().getZ()).isTreeValid()) {
 			levels.get(r.getStart().getZ()).remove(r);
+			//levels.put(r.getStart().getZ(), old);
 			throw new RoadViolatesPMRulesThrowable();
 		}
 

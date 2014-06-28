@@ -1,6 +1,7 @@
 package cmsc420.geometry;
 
 import java.awt.geom.Line2D;
+import cmsc420.geometry.CityNameComparator;
 
 
 /**
@@ -20,6 +21,8 @@ public class Road extends Geometry {
 	/** distance from start city to end city */
 	protected double distance;
 	
+	protected CityNameComparator comparator = new CityNameComparator();
+	
 	/**
 	 * Constructs a new road based on start city and end city. Calculates and
 	 * stores the distance between them.
@@ -30,7 +33,8 @@ public class Road extends Geometry {
 	 *            end city
 	 */
 	public Road(final City start, final City end) {
-		if (end.getName().compareTo(start.getName()) < 0) {
+		if (comparator.compare(end, start) < 0){
+		//if (end.getName().compareTo(start.getName()) < 0) {
 			this.start = end;
 			this.end = start;
 		} else {

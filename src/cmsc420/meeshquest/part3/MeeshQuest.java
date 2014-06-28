@@ -18,32 +18,36 @@ import cmsc420.xml.XmlUtility;
 
 public class MeeshQuest {
 	
-	//private final InputStream xmlInput;
+//	// ** FOR SUBMIT SERVER
+//	private final InputStream xmlInput;
 	
 	
+	//  FOR TESTING 
 	private File xmlInput;
 	private File xmlOutput;
 	// Constructor 
 	public MeeshQuest(String testFile){
 		xmlInput = new File(testFile);
-		xmlOutput = new File("test1.txt");
+		xmlOutput = new File("test1.xml");
 	}
+	// ^^ FOR TESTING
+	
 	
 	public MeeshQuest(){
 		
 	
 	
-	/* input stream/file */
+//	// ** FOR SUBMIT SERVER
 //	xmlInput = System.in;
+
 	
-	
-	// UNCOMMENT THIS TO TEST WITH FILES
-	xmlOutput = new File("test1.txt");
+	//  FOR TESTING 
+	xmlOutput = new File("test1.xml");
 
 	// Converted part 2 tests
 //	private File xmlInput = new File("input.Matt.slightlyLessMasterfulInput.xml");
 //	private File xmlInput = new File("JohnnyMao.shortestPath.xml");
-//	private File xmlInput = new File("MasterInput.xml");
+	xmlInput = new File("MasterInput.xml");
 //	private File xmlInput = new File("MasterRange.xml");
 //	xmlInput = new File("part2.dan.errortest1.xml");
 //	private File xmlInput = new File("part2.dan.errortest2.xml");
@@ -66,11 +70,19 @@ public class MeeshQuest {
 //	xmlInput = new File("testfiles/part3.public.primary.input.xml");
 
 	// Part 3 Student Tests
-	xmlInput = new File("part3.danzou.insertDelete.xml");
-//	xmlInput = new File("pm1_insert_delete.xml");
+//	xmlInput = new File("part3.danzou.insertDelete.xml");
+//	xmlInput = new File("pm1_insert_delete.xml");	
+//	xmlInput = new File("part3.PeterEnns.InsertDeleteInterspersed.input.xml");	
+//	xmlInput = new File("part3.PeterEnns.SmallPM1RandomInsertDelete.input.xml");
+//	xmlInput = new File("part3.PeterEnns.LargePM1RandomInsertDelete.input.xml");
 	
 	// Part 3 Dylan's Tests
-//	xmlInput = new File("dylanTests/dylan.simpleDelete.xml");
+//	xmlInput = new File("dylanTests/dylan.pm1Remove.DELETECITY.xml");
+//	xmlInput = new File("dylanTests/dylan.pm1Remove.UNMAPROAD.xml");
+//	xmlInput = new File("dylanTests/dylan.pm1Remove.UNMAPPORTAL.xml");
+//	xmlInput = new File("dylanTests/dylan.pm3Remove.DELETECITY.xml");
+//	xmlInput = new File("dylanTests/dylan.pm3Remove.UNMAPROAD.xml");
+//	xmlInput = new File("dylanTests/dylan.pm3Remove.UNMAPPORTAL.xml");
 	
 	
 	}
@@ -124,14 +136,14 @@ public class MeeshQuest {
         } finally {
             try {
             	
-            	// UNCOMMENT THIS TO TEST WITH FILES
+            	//  FOR TESTING 
 				XmlUtility.write(results, xmlOutput);
             	
                 XmlUtility.print(results);
             } catch (TransformerException e) {
                 System.exit(-1);
             }
-			// UNCOMMENT THIS TO TEST WITH FILES
+        	//  FOR TESTING 
 			 catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

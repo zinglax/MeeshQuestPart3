@@ -14,7 +14,7 @@ import cmsc420.meeshquest.part3.MeeshQuest;
 
 public class RegressionTests {
 
-	private File xmlOutput = new File("test1.txt");
+	private File xmlOutput = new File("test1.xml");
 	private File expected;
 	
 	

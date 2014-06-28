@@ -493,6 +493,14 @@ public class Command {
 		roadNode.setAttribute("end", road.getEnd().getName());
 		node.appendChild(roadNode);
 	}
+	
+	private void addRoadNode(final Element node, final String roadNodeName,
+			final String roadStart, final String roadEnd) {
+		final Element roadNode = results.createElement(roadNodeName);
+		roadNode.setAttribute("start", roadStart);
+		roadNode.setAttribute("end", roadEnd);
+		node.appendChild(roadNode);
+	}
 
 	/**
 	 * Inserts a road between the two cities (vertices) named by the start and
@@ -599,7 +607,7 @@ public class Command {
 			
 			Road r = l.unmapRoad(startName, endName);
 			
-			addRoadNode(outputNode, "roadDeleted", r);
+			addRoadNode(outputNode, "roadDeleted", startName, endName);
 
 			addSuccessNode(commandNode, parametersNode, outputNode);
 
@@ -633,7 +641,7 @@ public class Command {
 
 		
 		for (City c : l.portals.values()) {
-			if (c.getName().equals(portal_name)) {
+			if (c != null && c.getName().equals(portal_name)) {
 				l.levels.get(c.getZ()).removePortal(c);
 				
 				addSuccessNode(commandNode, parametersNode, outputNode);

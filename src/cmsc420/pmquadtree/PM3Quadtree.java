@@ -20,4 +20,8 @@ public class PM3Quadtree extends PMQuadtree {
 	public PM3Quadtree(final int spatialWidth, final int spatialHeight) {
 		super(new PM3Validator(), spatialWidth, spatialHeight, 3);
 	}
+	
+	public PM3Quadtree(){
+		super();
+	}
 }

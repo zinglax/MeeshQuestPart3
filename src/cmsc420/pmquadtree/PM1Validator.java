@@ -17,17 +17,25 @@ public class PM1Validator implements Validator {
 		 * 	0R
 		 * 	it only has one road
 		 * */
+		
+		int cityNum = 0;
+		// Gets number of cities in node
+		for (Geometry g : node.geometry){
+			if (g.isCity()){
+				cityNum++;
+			}
+		}
 	
 		// Too many cities
-		if (node.getNumPoints() > 1)
+		if (cityNum > 1)
 			return false;
 		
 		// A road passes through the node
-		if ((node.geometry.size() == 1 && node.getNumPoints() == 0))
+		if ((node.geometry.size() == 1 && cityNum == 0))
 			return true;
 		
 		// One city with all roads going to it
-		if (node.getNumPoints() == 1){
+		if (cityNum == 1){
 			// Copies the list of Geo. items in the node
 			LinkedList<Geometry> temp = new LinkedList<Geometry>();
 			temp.addAll(node.geometry);
