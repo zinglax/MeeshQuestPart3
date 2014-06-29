@@ -267,14 +267,14 @@ public class Leveler {
 
 		// City name conflicts with a portal name
 		for (City portal : portals.values()) {
-			if (portal.getName().equals(c.getName())) {
+			if (portal != null && portal.getName().equals(c.getName())) {
 				throw new DuplicateCityNameThrowable();
 			}
 		}
 
 		// City coordinate conflicts with a portal coordinate
 		for (City portal : portals.values()) {
-			if (portal.getLocationString().equals(c.getLocationString())) {
+			if (portal != null && portal.getLocationString().equals(c.getLocationString())) {
 				throw new DuplicateCityCoordinateThrowable();
 			}
 		}

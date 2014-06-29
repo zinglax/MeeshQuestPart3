@@ -288,7 +288,7 @@ public abstract class PMQuadtree {
 			/* add the road or isolated city to the geometry list */
 			addGeometryToList(g);
 
-			//
+			
 			if (isValid()) {
 				return this;
 			} else {
@@ -893,14 +893,24 @@ public abstract class PMQuadtree {
 
 		root = root.add(g, spatialOrigin, spatialWidth, spatialHeight);
 		allRoads.add(g);
+//		if (Inclusive2DIntersectionVerifier.intersects(
+//				g.getStart().toPoint2D(), world)
+//				&& Inclusive2DIntersectionVerifier.intersects(g.getEnd()
+//						.toPoint2D(), world)) {
+//			increaseNumRoadsMap(g.getStart().getName());
+//			increaseNumRoadsMap(g.getEnd().getName());
+//		}
+		
+		
 		if (Inclusive2DIntersectionVerifier.intersects(
-				g.getStart().toPoint2D(), world)
-				&& Inclusive2DIntersectionVerifier.intersects(g.getEnd()
-						.toPoint2D(), world)) {
+				g.getStart().toPoint2D(), world)){
 			increaseNumRoadsMap(g.getStart().getName());
-			increaseNumRoadsMap(g.getEnd().getName());
-
 		}
+		if (Inclusive2DIntersectionVerifier.intersects(g.getEnd()
+				.toPoint2D(), world)){
+			increaseNumRoadsMap(g.getEnd().getName());
+		}
+		
 
 		// TODO in converted test part2.dan.shortestPaths.xml a valid road has
 		// both endpoints in the spatial map while in part2.dan.nearestcity2.xml

@@ -28,7 +28,7 @@ public class StudentTests {
 	
 	@Test
 	public void pm1_insert_delete() throws IOException {
-		final MeeshQuest m = new MeeshQuest("pm1_insert_delete.xml");
+		final MeeshQuest m = new MeeshQuest("pm1_insert_delete2.xml");
         m.processInput();       
         expected = new File("part3.RobertBaxter.pm1_insert_delete.output.xml");
         Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
@@ -57,4 +57,29 @@ public class StudentTests {
         expected = new File("part3.PeterEnns.LargePM1RandomInsertDelete.output.xml");
         Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
 	}
+	
+	@Test
+	public void leDelete() throws IOException {
+		final MeeshQuest m = new MeeshQuest("LeDelete.xml");
+        m.processInput();       
+        expected = new File("part3.ZehaoSui.delete6.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	
+	@Test
+	public void insert_delete() throws IOException {
+		final MeeshQuest m = new MeeshQuest("pm1_insert_delete.xml");
+        m.processInput();       
+        expected = new File("part3.MichaelConstantine.pm1_insert_delete.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	
+	@Test
+	public void megaRange() throws IOException {
+		final MeeshQuest m = new MeeshQuest("MegaRangeTest.xml");
+        m.processInput();       
+        expected = new File("part3.Kyle.MegaRangeTest.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	
 }

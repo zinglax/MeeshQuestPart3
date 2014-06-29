@@ -1209,8 +1209,21 @@ public class Command {
 			addErrorNode("noCitiesExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> citiesInRange = new TreeSet<Geometry>();
-			rangeHelper(new Circle2D.Double(x, y, radius),
-					pmQuadtree.getRoot(), citiesInRange, false, true);
+			
+			// For loop checking if level should be searched for cities
+			for (int level : l.levels.keySet()){
+				
+				// Check if the level will have a search circle 
+				if (Math.abs(level - z) <= radius){
+					double levelRadius = (double) Math.sqrt((Math.pow(radius, 2) - Math.pow(Math.abs(level - z), 2)));
+					rangeHelper(new Circle2D.Double(x, y, levelRadius), l.levels.get(level).getRoot(), citiesInRange, false, true);
+					
+				}
+			}
+			
+			
+//			rangeHelper(new Circle2D.Double(x, y, radius),
+//					pmQuadtree.getRoot(), citiesInRange, false, true);
 
 			/* print out cities within range */
 			if (citiesInRange.isEmpty()) {
@@ -1280,8 +1293,21 @@ public class Command {
 			addErrorNode("noRoadsExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> roadsInRange = new TreeSet<Geometry>();
-			rangeHelper(new Circle2D.Double(x, y, radius),
-					pmQuadtree.getRoot(), roadsInRange, true, false);
+			
+			// For loop checking if level should be searched for cities
+						for (int level : l.levels.keySet()){
+							
+							// Check if the level will have a search circle 
+							if (Math.abs(level - z) <= radius){
+								double levelRadius = (double) Math.sqrt((Math.pow(radius, 2) - Math.pow(Math.abs(level - z), 2)));
+								rangeHelper(new Circle2D.Double(x, y, levelRadius), l.levels.get(level).getRoot(), roadsInRange, true, false);
+								
+							}
+						}
+			
+			
+//			rangeHelper(new Circle2D.Double(x, y, radius),
+//					pmQuadtree.getRoot(), roadsInRange, true, false);
 
 			/* print out cities within range */
 			if (roadsInRange.isEmpty()) {
@@ -1329,7 +1355,7 @@ public class Command {
 			final Black leaf = (Black) node;
 			for (Geometry g : leaf.getGeometry()) {
 				if (includeCities
-						&& g.isCity()
+						&& g.isCity() && ((City)g).isPortal() == false
 						&& !gInRange.contains(g)
 						&& Inclusive2DIntersectionVerifier.intersects(
 								((City) g).toPoint2D(), range)) {
@@ -1406,7 +1432,7 @@ public class Command {
 		if (n.getType() == Node.BLACK) {
 			Black b = (Black) n;
 
-			if (b.getCity() != null
+			if (b.getCity() != null && b.getCity().isPortal() == false
 					&& pmQuadtree.isIsolatedCity(b.getCity()) == isNearestIsolatedCity) {
 				return b.getCity();
 			}
@@ -1423,7 +1449,7 @@ public class Command {
 					Black b = (Black) kid;
 					City c = b.getCity();
 
-					if (c != null
+					if (c != null && c.isPortal() == false
 							&& pmQuadtree.isIsolatedCity(c) == isNearestIsolatedCity) {
 						double dist = point.distance(c.toPoint2D());
 						nearCities.add(new NearestSearchRegion(kid, dist, c));
