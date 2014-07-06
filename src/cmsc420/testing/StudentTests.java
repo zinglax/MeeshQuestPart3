@@ -82,4 +82,29 @@ public class StudentTests {
         Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
 	}
 	
+	@Test
+	public void oppositeofLongestPath() throws IOException {
+		final MeeshQuest m = new MeeshQuest("OppositeofLongestPath.xml");
+        m.processInput();       
+        expected = new File("part3.ZehaoSui.ShortestPath.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	@Test
+	public void pm1ShortestTest7() throws IOException {
+		final MeeshQuest m = new MeeshQuest("part3.JBergman.pm1ShortestTest7.xml");
+        m.processInput();       
+        expected = new File("part3.JBergman.pm1ShortestTest7.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	
+	@Test
+	public void pm1ShortestTest8() throws IOException {
+		final MeeshQuest m = new MeeshQuest("part3.JBergman.pm1ShortestTest8.xml");
+        m.processInput();       
+        expected = new File("part3.JBergman.pm1ShortestTest8.output.xml");
+        Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+	}
+	
+	
+	
 }

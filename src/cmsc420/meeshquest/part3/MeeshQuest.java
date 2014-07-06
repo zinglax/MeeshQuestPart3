@@ -76,8 +76,10 @@ public class MeeshQuest {
 //	xmlInput = new File("part3.PeterEnns.SmallPM1RandomInsertDelete.input.xml");
 //	xmlInput = new File("part3.PeterEnns.LargePM1RandomInsertDelete.input.xml");
 //	xmlInput = new File("pm1_insert_delete2.xml");
-	xmlInput = new File("MegaRangeTest.xml");
-	
+//	xmlInput = new File("MegaRangeTest.xml");
+//	xmlInput = new File("OppositeofLongestPath.xml");	
+	xmlInput = new File("part3.JBergman.pm1ShortestTest7.xml");
+//	xmlInput = new File("part3.JBergman.pm1ShortestTest8.xml");
 	
 	// Part 3 Dylan's Tests
 //	xmlInput = new File("dylanTests/dylan.pm1Remove.DELETECITY.xml");
@@ -87,6 +89,10 @@ public class MeeshQuest {
 //	xmlInput = new File("dylanTests/dylan.pm3Remove.UNMAPROAD.xml");
 //	xmlInput = new File("dylanTests/dylan.pm3Remove.UNMAPPORTAL.xml");
 //	xmlInput = new File("dylanTests/dylan.pm1AddRoad.xml");
+//	xmlInput = new File("dylanTests/dylan.pm1addRoadDanZou.xml");
+
+
+	
 	
 	}
 	

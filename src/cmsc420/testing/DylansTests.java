@@ -71,6 +71,15 @@ public class DylansTests {
         assertEquals(1,1);
 	}
 	
+	@Test
+	public void pm1AddDanZou() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1addRoadDanZou.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
 	
 }
 
