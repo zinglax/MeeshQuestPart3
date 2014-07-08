@@ -20,7 +20,7 @@ import cmsc420.geometry.City;
  */
 public class Path {
 	/* list of city names along path from start city to end city */
-	final protected LinkedList<City> pathList;
+	public LinkedList<City> pathList;
 
 	/* total distance of path from start city to end city */
 	protected double distance;
@@ -42,7 +42,7 @@ public class Path {
 	 * @param cityName
 	 *            name of city (edge) to be added to path
 	 */
-	void addEdge(final City city) {
+	public void addEdge(final City city) {
 		pathList.addFirst(city);
 	}
 

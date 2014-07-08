@@ -26,6 +26,8 @@ public abstract class PMQuadtree {
 	public int numIsolatedCities;
 
 	public boolean hasPortal = false;
+	
+	public City portal;
 
 	public boolean hasPortal() {
 		return hasPortal;
@@ -987,6 +989,7 @@ public abstract class PMQuadtree {
 		root = root.add(c, spatialOrigin, spatialWidth, spatialHeight);
 		// numRoadsForCity.put(c.getName(), 0);
 		hasPortal = true;
+		portal = c;
 
 	}
 

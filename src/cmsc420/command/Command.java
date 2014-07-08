@@ -1162,15 +1162,124 @@ public class Command {
 				return;
 			}
 			
+			/* Check Intermediate levels for portals  and creation of hops Path*/
+			Path hopsPath = new Path(0); // Path of intermediate portal hops
+			String direction;
+			l.levels.keySet();
+			int startLevel = startcity.getZ();
+			int endLevel = endcity.getZ();
+			if (startLevel > endLevel){
+				direction = "down";
+				if (startLevel == 0){
+					addErrorNode("noPathExists", commandNode, parametersNode);
+					return;
+				}
+				int count = startLevel;
+				while (count != endLevel && l.levels.get(count).hasPortal){
+					hopsPath.addEdge(l.levels.get(count).portal);
+					count++;
+				}
+				if (count != endLevel){
+					addErrorNode("noPathExists", commandNode, parametersNode);
+					return;
+				}
+				
+			} else {
+				direction = "up";
+				
+				int count = startLevel;
+				while(count != endLevel && l.levels.get(count).hasPortal){
+					hopsPath.addEdge(l.levels.get(count).portal);
+					count++;
+				}
+				if (count != endLevel){
+					addErrorNode("noPathExists", commandNode, parametersNode);
+					return;
+				}
+				
+			
+			}
+			
+			
+			 
+			
+			
 			/* Dijkstra */
 			final DecimalFormat decimalFormat = new DecimalFormat("#0.000");
 			final Dijkstranator dijkstranator = new Dijkstranator(l.roads);
+			
+			/* Portals on each level */
+			City startPortal = pmQuadtreeStart.portal;
+			City endPortal = pmQuadtreeEnd.portal;
+			
+			/* Nearest cities to the start and end portals */
+			City NearestCityToStartPortal = nearestCityHelper((Point2D.Float) startPortal.toPoint2D(), false);
+			City NearestCityToEndPortal = nearestCityHelper((Point2D.Float) endPortal.toPoint2D(), false);
+			
+			/* Paths */
+			Path startPath;
+			Path endPath;
+			
+			/* Nearest city to portal is the start city */
+			if (startcity.equals(NearestCityToStartPortal)){
+				/* Calculate OffRoad Distance from start city to start portal */
+				double startDistance = Math.sqrt(Math.pow((startcity.getX()-startPortal.getX()), 2)+
+						Math.pow((startcity.getY()-startPortal.getY()), 2));
+				startDistance = 2*startDistance;
+				startPath = new Path(startDistance);
+				startPath.addEdge(startPortal);
+				startPath.addEdge(startcity);
+			} else {
+				/* Nearest city to portal is the end city */
+				startPath = dijkstranator.getShortestPath(startcity, NearestCityToStartPortal);
+				
+				/* Checking if there is a path */
+				if (startPath == null){
+					addErrorNode("noPathExists", commandNode, parametersNode);
+					return;
+				}
+				
+				/* Distance from startPortal to NearestCity */
+				double startDistance = Math.sqrt(Math.pow((NearestCityToStartPortal.getX()-startPortal.getX()), 2)+
+						Math.pow((NearestCityToStartPortal.getY()-startPortal.getY()), 2));
+				startDistance = 2*startDistance;
+				startPath.setDistance(startPath.getDistance() * 2);
+				
+				startPath.pathList.addLast(startPortal);
+			}
+			
+			
+			/* Nearest city to portal is the end city */
+			if (endcity.equals(NearestCityToEndPortal)){
+				/* Calculate OffRoad Distance from end city to end portal */
+				double endDistance = Math.sqrt(Math.pow((endcity.getX()-endPortal.getX()), 2)+
+						Math.pow((endcity.getY()-endPortal.getY()), 2));
+				endDistance = 2*endDistance;
+				endPath = new Path(endDistance);
+				endPath.addEdge(endcity);
+				endPath.addEdge(endPortal);
+			} else {
+				/* Nearest city to portal is the end city */
+				endPath = dijkstranator.getShortestPath(NearestCityToStartPortal, endcity);
+				
+				/* Checking if there is a path */
+				if (endPath == null){
+					addErrorNode("noPathExists", commandNode, parametersNode);
+					return;
+				}
+				
+				/* Distance from startPortal to NearestCity */
+				double endDistance = Math.sqrt(Math.pow((NearestCityToEndPortal.getX()-endPortal.getX()), 2)+
+						Math.pow((NearestCityToEndPortal.getY()-endPortal.getY()), 2));
+				endDistance = 2*endDistance;
+				endPath.setDistance(endPath.getDistance() * 2);
+				
+				endPath.pathList.addFirst(endPortal);
+			}
+			
+			/* At this point there should be 2 paths  */
+			
 
-			// TODO Find the nearest city to the portal on the start level, then create a path to it
-			// From the nearest city to the portal calculate the distance travel and multiply by 2, then jump in the portal
-			// TODO Find the nearest city to the portal on the end level, then create a path to it
-			// From the portal to its nearest city, calculate the distanced to it and multiply by two. 
-		
 		}
 	}
 
