@@ -30,6 +30,10 @@ public class RoadAdjacencyList {
 	final protected TreeMap<City, TreeSet<Road>> adjacencyList = new TreeMap<City, TreeSet<Road>>(
 			new CityNameComparator());
 
+	
+	//public RoadAdjacencyList() { }
+	
+	
 	/**
 	 * Adds an undirected road to the adjacency list
 	 * 

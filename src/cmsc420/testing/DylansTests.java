@@ -81,5 +81,86 @@ public class DylansTests {
 	}
 	
 	
+	@Test
+	public void pm1ShortestPathEndCityNotMapped() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathEndCityNotMapped.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathStartCityNotMapped() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathStartCityNotMapped.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	
+	@Test
+	public void pm1ShortestPathEndLevelDoesNotHavePortal() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathEndLevelDoesNotHavePortal.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathIntermediateLevelDoesNotHavePortal() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathIntermediateLevelDoesNotHavePortal.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathOnOneLevel() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathOnOneLevel.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathStartAndEndAreOnAdjacentLevels() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathStartAndEndAreOnAdjacentLevels.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathStartAndEndAreTheSame() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathStartAndEndAreTheSame.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}	
+	
+	@Test
+	public void pm1ShortestPathStartAndEndHaveMultipleIntermediateLevels() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathStartAndEndHaveMultipleIntermediateLevels.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
+	
+	@Test
+	public void pm1ShortestPathStartLevelDoesNotHavePortal() throws IOException {
+		final MeeshQuest m = new MeeshQuest("dylanTests/dylan.pm1ShortestPathStartLevelDoesNotHavePortal.xml");
+        m.processInput();       
+        //expected = new File("");
+        //Assert.assertEquals(FileUtils.readLines(expected), FileUtils.readLines(xmlOutput));
+        assertEquals(1,1);
+	}
 }
 

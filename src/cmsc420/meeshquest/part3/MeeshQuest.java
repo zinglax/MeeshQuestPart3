@@ -90,7 +90,9 @@ public class MeeshQuest {
 //	xmlInput = new File("dylanTests/dylan.pm3Remove.UNMAPPORTAL.xml");
 //	xmlInput = new File("dylanTests/dylan.pm1AddRoad.xml");
 //	xmlInput = new File("dylanTests/dylan.pm1addRoadDanZou.xml");
-
+//	xmlInput = new File("dylanTests/dylan.pm1ShortestPathStartAndEndAreOnAdjacentLevels.xml");
+//	xmlInput = new File("dylanTests/dylan.pm1ShortestPathIntermediateLevelDoesNotHavePortal.xml");
+	
 
 	
 	

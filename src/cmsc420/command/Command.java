@@ -265,7 +265,7 @@ public class Command {
 	 * unmapped if the last road to them is removed. These, however, won’t be
 	 * printed.
 	 */
-	// TODO
+
 	public void processDeleteCity(final Element node) {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
@@ -316,7 +316,7 @@ public class Command {
 
 			addSuccessNode(commandNode, parametersNode, outputNode);
 
-			//TreeSet<City> citiesToRemove = new TreeSet<City>();
+			// TreeSet<City> citiesToRemove = new TreeSet<City>();
 
 			// Removes any isolated cities created from prior removal
 			for (City city : l.citiesByLocation) {
@@ -327,14 +327,14 @@ public class Command {
 					if (l.roads.getRoadSet(city).size() == 0
 							&& !city.isPortal()) {
 						l.levels.get(city.getZ()).remove(city);
-						//citiesToRemove.add(city);
-						//l.citiesByName.remove(city.getName());
+						// citiesToRemove.add(city);
+						// l.citiesByName.remove(city.getName());
 						l.mappedCities.remove(city);
 					}
 				}
 			}
 
-			//l.citiesByLocation.removeAll(citiesToRemove);
+			// l.citiesByLocation.removeAll(citiesToRemove);
 
 		} else {
 			addErrorNode("cityDoesNotExist", commandNode, parametersNode);
@@ -493,7 +493,7 @@ public class Command {
 		roadNode.setAttribute("end", road.getEnd().getName());
 		node.appendChild(roadNode);
 	}
-	
+
 	private void addRoadNode(final Element node, final String roadNodeName,
 			final String roadStart, final String roadEnd) {
 		final Element roadNode = results.createElement(roadNodeName);
@@ -598,20 +598,19 @@ public class Command {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
 		final Element outputNode = results.createElement("output");
-		final String startName = processStringAttribute(node, "start", parametersNode);
-		final String endName = processStringAttribute(node, "end", parametersNode);
-		
-		
+		final String startName = processStringAttribute(node, "start",
+				parametersNode);
+		final String endName = processStringAttribute(node, "end",
+				parametersNode);
+
 		try {
 
-			
 			Road r = l.unmapRoad(startName, endName);
-			
+
 			addRoadNode(outputNode, "roadDeleted", startName, endName);
 
 			addSuccessNode(commandNode, parametersNode, outputNode);
 
-			
 		} catch (StartPointDoesNotExistThrowable e) {
 			addErrorNode("startPointDoesNotExist", commandNode, parametersNode);
 		} catch (EndPointDoesNotExistThrowable e) {
@@ -639,11 +638,10 @@ public class Command {
 		final String portal_name = processStringAttribute(node, "name",
 				parametersNode);
 
-		
 		for (City c : l.portals.values()) {
 			if (c != null && c.getName().equals(portal_name)) {
 				l.levels.get(c.getZ()).removePortal(c);
-				
+
 				addSuccessNode(commandNode, parametersNode, outputNode);
 				l.portals.remove(c.getZ());
 				return;
@@ -775,18 +773,17 @@ public class Command {
 	// TODO Start and end cities are on different z levels, driving off road
 	// costs x2
 	// TODO portalDoesNotExist, noPathExists
-	public void processShortestPath(final Element node) throws IOException,
+	public void processShortestPathOld(final Element node) throws IOException,
 			ParserConfigurationException, TransformerException {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
 
-		
 		/* Processes parameters */
 		final String start = processStringAttribute(node, "start",
 				parametersNode);
 		final String end = processStringAttribute(node, "end", parametersNode);
 
-		/* Gets the cities  */
+		/* Gets the cities */
 		City startcity = l.citiesByName.get(start);
 		City endcity = l.citiesByName.get(end);
 
@@ -814,18 +811,16 @@ public class Command {
 			return;
 		}
 
-		
 		/* Gets the start cities pmQuadtree */
 		pmQuadtree = l.levels.get(startcity.getZ());
 
-		
 		/* Start City Check */
 		if (!pmQuadtree.containsCity(start)) {
 			addErrorNode("nonExistentStart", commandNode, parametersNode);
-		/* End City Check */			
+			/* End City Check */
 		} else if (!pmQuadtree.containsCity(end)) {
 			addErrorNode("nonExistentEnd", commandNode, parametersNode);
-		/* Check to see if cities have roads mapped to them */
+			/* Check to see if cities have roads mapped to them */
 		} else if (!l.roads.getCitySet().contains(l.citiesByName.get(start))
 				|| !l.roads.getCitySet().contains(l.citiesByName.get(end))) {
 			/* One of the cities is isolated (NOT NECESSARY FOR PART 3) */
@@ -943,13 +938,13 @@ public class Command {
 						city2 = city3;
 					}
 				}
-				
-				/* Output Processing  */
+
+				/* Output Processing */
 				outputNode.appendChild(pathNode);
 				Element successNode = addSuccessNode(commandNode,
 						parametersNode, outputNode);
 
-				/* Output Processing  */
+				/* Output Processing */
 				if (!saveHTMLName.equals("")) {
 					/* save shortest path to HTML */
 					Document shortestPathDoc = XmlUtility.getDocumentBuilder()
@@ -965,18 +960,17 @@ public class Command {
 		}
 	}
 
-	public void processShortestPathNew(final Element node) throws IOException,
-	ParserConfigurationException, TransformerException {
+	public void processShortestPath(final Element node) throws IOException,
+			ParserConfigurationException, TransformerException {
 		final Element commandNode = getCommandNode(node);
 		final Element parametersNode = results.createElement("parameters");
 
-		
 		/* Processes parameters */
 		final String start = processStringAttribute(node, "start",
 				parametersNode);
 		final String end = processStringAttribute(node, "end", parametersNode);
 
-		/* Gets the cities  */
+		/* Gets the cities */
 		City startcity = l.citiesByName.get(start);
 		City endcity = l.citiesByName.get(end);
 
@@ -1002,15 +996,15 @@ public class Command {
 			addErrorNode("nonExistentEnd", commandNode, parametersNode);
 			return;
 		}
-		
+
 		/* Start and End Cities are on the same level */
-		if (startcity.getZ() == endcity.getZ()){
+		if (startcity.getZ() == endcity.getZ()) {
 			/* Gets the cities pmQuadtree */
 			pmQuadtree = l.levels.get(startcity.getZ());
 
-			// One of the cities is isolated or is itself 
+			// One of the cities is isolated or is itself
 			if (!l.roads.getCitySet().contains(l.citiesByName.get(start))
-				|| !l.roads.getCitySet().contains(l.citiesByName.get(end))){
+					|| !l.roads.getCitySet().contains(l.citiesByName.get(end))) {
 				/* Start and end are the same */
 				if (start.equals(end)) {
 					final Element outputNode = results.createElement("output");
@@ -1035,8 +1029,8 @@ public class Command {
 
 					if (!saveHTMLName.equals("")) {
 						/* save shortest path to HTML */
-						Document shortestPathDoc = XmlUtility.getDocumentBuilder()
-								.newDocument();
+						Document shortestPathDoc = XmlUtility
+								.getDocumentBuilder().newDocument();
 						org.w3c.dom.Node spNode = shortestPathDoc.importNode(
 								successNode, true);
 						shortestPathDoc.appendChild(spNode);
@@ -1049,7 +1043,7 @@ public class Command {
 					return;
 				}
 			}
-			
+
 			/* Dijkstra */
 			final DecimalFormat decimalFormat = new DecimalFormat("#0.000");
 			final Dijkstranator dijkstranator = new Dijkstranator(l.roads);
@@ -1128,13 +1122,13 @@ public class Command {
 						city2 = city3;
 					}
 				}
-				
-				/* Output Processing  */
+
+				/* Output Processing */
 				outputNode.appendChild(pathNode);
 				Element successNode = addSuccessNode(commandNode,
 						parametersNode, outputNode);
 
-				/* Output Processing  */
+				/* Output Processing */
 				if (!saveHTMLName.equals("")) {
 					/* save shortest path to HTML */
 					Document shortestPathDoc = XmlUtility.getDocumentBuilder()
@@ -1148,142 +1142,261 @@ public class Command {
 				}
 			}
 
-			
-		/* Start and End Cities are on different levels */
-		} else { 
-			
+			/* Start and End Cities are on different levels */
+		} else {
+
 			/* Getting the start and end Levels */
 			PMQuadtree pmQuadtreeStart = l.levels.get(startcity.getZ());
 			PMQuadtree pmQuadtreeEnd = l.levels.get(endcity.getZ());
 
 			/* No portal on one of the levels */
-			if (!pmQuadtreeStart.hasPortal ||  !pmQuadtreeEnd.hasPortal){
-				addErrorNode("noPathExists", commandNode, parametersNode);
+			if (!pmQuadtreeStart.hasPortal || !pmQuadtreeEnd.hasPortal) {
+				addErrorNode("portalDoesNotExist", commandNode, parametersNode);
 				return;
 			}
-			
-			/* Check Intermediate levels for portals  and creation of hops Path*/
+
+			/* Check Intermediate levels for portals and creation of hops Path */
 			Path hopsPath = new Path(0); // Path of intermediate portal hops
-			String direction;
+			String hopDirection;
 			l.levels.keySet();
 			int startLevel = startcity.getZ();
 			int endLevel = endcity.getZ();
-			if (startLevel > endLevel){
-				direction = "down";
-				if (startLevel == 0){
+			if (startLevel > endLevel) {
+				hopDirection = "down";
+				if (startLevel == 0) {
 					addErrorNode("noPathExists", commandNode, parametersNode);
 					return;
 				}
-				int count = startLevel;
-				while (count != endLevel && l.levels.get(count).hasPortal){
-					hopsPath.addEdge(l.levels.get(count).portal);
-					count++;
+				int count = startLevel-1;
+				while (count > endLevel) {
+					if (l.levels.get(count) != null && l.levels.get(count).hasPortal){
+						hopsPath.pathList.addLast(l.levels.get(count).portal);
+					}
+					count--;
 				}
-				if (count != endLevel){
+				if (count != endLevel) {
 					addErrorNode("noPathExists", commandNode, parametersNode);
 					return;
 				}
-				
+
 			} else {
-				direction = "up";
-				
-				int count = startLevel;
-				while(count != endLevel && l.levels.get(count).hasPortal){
-					hopsPath.addEdge(l.levels.get(count).portal);
+				hopDirection = "up";
+
+				int count = startLevel+1;
+				while (count < endLevel) {
+					if (l.levels.get(count) != null && l.levels.get(count).hasPortal){
+						hopsPath.pathList.addLast(l.levels.get(count).portal);
+					}
 					count++;
 				}
-				if (count != endLevel){
+				if (count != endLevel) {
 					addErrorNode("noPathExists", commandNode, parametersNode);
 					return;
 				}
-				
-			
+
 			}
-			
-			
-			 
-			
-			
+
 			/* Dijkstra */
 			final DecimalFormat decimalFormat = new DecimalFormat("#0.000");
 			final Dijkstranator dijkstranator = new Dijkstranator(l.roads);
-			
+
 			/* Portals on each level */
 			City startPortal = pmQuadtreeStart.portal;
 			City endPortal = pmQuadtreeEnd.portal;
-			
+
 			/* Nearest cities to the start and end portals */
-			City NearestCityToStartPortal = nearestCityHelper((Point2D.Float) startPortal.toPoint2D(), false);
-			City NearestCityToEndPortal = nearestCityHelper((Point2D.Float) endPortal.toPoint2D(), false);
-			
+			City NearestCityToStartPortal = nearestCityHelper(
+					(Point2D.Float) startPortal.toPoint2D(), false, pmQuadtreeStart);
+			City NearestCityToEndPortal = nearestCityHelper(
+					(Point2D.Float) endPortal.toPoint2D(), false, pmQuadtreeEnd);
+
 			/* Paths */
 			Path startPath;
 			Path endPath;
-			
+
 			/* Nearest city to portal is the start city */
-			if (startcity.equals(NearestCityToStartPortal)){
+			if (startcity.equals(NearestCityToStartPortal)) {
 				/* Calculate OffRoad Distance from start city to start portal */
-				double startDistance = Math.sqrt(Math.pow((startcity.getX()-startPortal.getX()), 2)+
-						Math.pow((startcity.getY()-startPortal.getY()), 2));
-				startDistance = 2*startDistance;
+				double startDistance = Math.sqrt(Math.pow(
+						(startcity.getX() - startPortal.getX()), 2)
+						+ Math.pow((startcity.getY() - startPortal.getY()), 2));
+				startDistance = 2 * startDistance;
 				startPath = new Path(startDistance);
 				startPath.addEdge(startPortal);
 				startPath.addEdge(startcity);
 			} else {
 				/* Nearest city to portal is the end city */
-				startPath = dijkstranator.getShortestPath(startcity, NearestCityToStartPortal);
-				
+				startPath = dijkstranator.getShortestPath(startcity,
+						NearestCityToStartPortal);
+
 				/* Checking if there is a path */
-				if (startPath == null){
+				if (startPath == null) {
 					addErrorNode("noPathExists", commandNode, parametersNode);
 					return;
 				}
-				
+
 				/* Distance from startPortal to NearestCity */
-				double startDistance = Math.sqrt(Math.pow((NearestCityToStartPortal.getX()-startPortal.getX()), 2)+
-						Math.pow((NearestCityToStartPortal.getY()-startPortal.getY()), 2));
-				startDistance = 2*startDistance;
-				startPath.setDistance(startPath.getDistance() * 2);
-				
+				double startDistance = Math.sqrt(Math.pow(
+						(NearestCityToStartPortal.getX() - startPortal.getX()),
+						2)
+						+ Math.pow(
+								(NearestCityToStartPortal.getY() - startPortal
+										.getY()), 2));
+				startDistance = 2 * startDistance;
+				startPath.setDistance(startPath.getDistance() + startDistance);
+
 				startPath.pathList.addLast(startPortal);
 			}
-			
-			
+
 			/* Nearest city to portal is the end city */
-			if (endcity.equals(NearestCityToEndPortal)){
+			if (endcity.equals(NearestCityToEndPortal)) {
 				/* Calculate OffRoad Distance from end city to end portal */
-				double endDistance = Math.sqrt(Math.pow((endcity.getX()-endPortal.getX()), 2)+
-						Math.pow((endcity.getY()-endPortal.getY()), 2));
-				endDistance = 2*endDistance;
+				double endDistance = Math.sqrt(Math.pow(
+						(endcity.getX() - endPortal.getX()), 2)
+						+ Math.pow((endcity.getY() - endPortal.getY()), 2));
+				endDistance = 2 * endDistance;
 				endPath = new Path(endDistance);
 				endPath.addEdge(endcity);
 				endPath.addEdge(endPortal);
 			} else {
 				/* Nearest city to portal is the end city */
-				endPath = dijkstranator.getShortestPath(NearestCityToStartPortal, endcity);
-				
+				endPath = dijkstranator.getShortestPath(
+						NearestCityToEndPortal, endcity);
+
 				/* Checking if there is a path */
-				if (endPath == null){
+				if (endPath == null) {
 					addErrorNode("noPathExists", commandNode, parametersNode);
 					return;
 				}
-				
+
 				/* Distance from startPortal to NearestCity */
-				double endDistance = Math.sqrt(Math.pow((NearestCityToEndPortal.getX()-endPortal.getX()), 2)+
-						Math.pow((NearestCityToEndPortal.getY()-endPortal.getY()), 2));
-				endDistance = 2*endDistance;
-				endPath.setDistance(endPath.getDistance() * 2);
-				
+				double endDistance = Math.sqrt(Math.pow(
+						(NearestCityToEndPortal.getX() - endPortal.getX()), 2)
+						+ Math.pow((NearestCityToEndPortal.getY() - endPortal
+								.getY()), 2));
+				endDistance = 2 * endDistance;
+				endPath.setDistance(endPath.getDistance() + endDistance);
+
 				endPath.pathList.addFirst(endPortal);
 			}
-			
-			/* At this point there should be 2 paths  */
-			
 
+			/*
+			 * At this point there should be 3 paths one for the start level one
+			 * for the end level and one for the hops in between
+			 */
+
+			/*
+			 * Concatinating all of the path objects into one that can be looped
+			 * over
+			 */
+			Path totalPath = new Path(startPath.getDistance()
+					+ endPath.getDistance());
+			totalPath.pathList.addAll(startPath.pathList);
+			totalPath.pathList.addAll(hopsPath.pathList);
+			totalPath.pathList.addAll(endPath.pathList);
+
+			final Element outputNode = results.createElement("output");
+
+			final Element pathNode = results.createElement("path");
+			pathNode.setAttribute("length",
+					decimalFormat.format(totalPath.getDistance()));
+			pathNode.setAttribute("hops", Integer.toString(totalPath.getHops()));
+
+			final LinkedList<City> cityList = totalPath.getCityList();
+
+			/* if required, save the map to an image */
+			if (!saveMapName.equals("")) {
+				saveShortestPathMap(saveMapName, cityList);
+			}
+			if (!saveHTMLName.equals("")) {
+				saveShortestPathMap(saveHTMLName, cityList);
+			}
+
+			if (cityList.size() > 1) {
+				/* add the first road */
+				City city1 = cityList.remove();
+				City city2 = cityList.remove();
+				
+				Element roadNode;
+				if (city2.isPortal()){
+					roadNode = results.createElement("offroad");
+				} else {
+					roadNode = results.createElement("road");
+				}
+				roadNode.setAttribute("start", city1.getName());
+				roadNode.setAttribute("end", city2.getName());
+				pathNode.appendChild(roadNode);
+
+				while (!cityList.isEmpty()) {
+					City city3 = cityList.remove();
+					final String direction;
+
+					if (city2.getZ() != city3.getZ()){
+						direction = hopDirection;
+					} else {
+					
+						/* process the angle */
+						Arc2D.Float arc = new Arc2D.Float();
+						arc.setArcByTangent(city1.toPoint2D(), city2.toPoint2D(),
+								city3.toPoint2D(), 1);
+	
+						/* print out the direction */
+						double angle = arc.getAngleExtent();
+						while (angle < 0) {
+							angle += 360;
+						}
+						while (angle > 360) {
+							angle -= 360;
+						}
+						if (angle > 180 && angle <= 180 + 135) {
+							direction = "left";
+						} else if (angle > 45 && angle < 180) {
+							direction = "right";
+						} else {
+							direction = "straight";
+						}
+					}
+					Element directionNode = results.createElement(direction);
+					pathNode.appendChild(directionNode);
+
+					/* print out the next road */
+					if (city2.isPortal() && city3.isPortal()){
+						roadNode = results.createElement("jump");
+					} else if (city2.isPortal() || city3.isPortal()){
+						roadNode = results.createElement("offroad");
+					} else {
+						roadNode = results.createElement("road");
+					}
+					
+					roadNode.setAttribute("start", city2.getName());
+					roadNode.setAttribute("end", city3.getName());
+					pathNode.appendChild(roadNode);
+
+					/* increment city references */
+					city1 = city2;
+					city2 = city3;
+				}
+			}
+
+			/* Output Processing */
+			outputNode.appendChild(pathNode);
+			Element successNode = addSuccessNode(commandNode, parametersNode,
+					outputNode);
+
+			/* Output Processing */
+			if (!saveHTMLName.equals("")) {
+				/* save shortest path to HTML */
+				Document shortestPathDoc = XmlUtility.getDocumentBuilder()
+						.newDocument();
+				org.w3c.dom.Node spNode = shortestPathDoc.importNode(
+						successNode, true);
+				shortestPathDoc.appendChild(spNode);
+				XmlUtility.transform(shortestPathDoc, new File(
+						"shortestPath.xsl"), new File(saveHTMLName + ".html"));
+			}
 		}
 	}
 
-	
 	private void saveShortestPathMap(final String mapName,
 			final List<City> cityList) throws IOException {
 		final CanvasPlus map = new CanvasPlus();
@@ -1543,21 +1656,24 @@ public class Command {
 			addErrorNode("noCitiesExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> citiesInRange = new TreeSet<Geometry>();
-			
+
 			// For loop checking if level should be searched for cities
-			for (int level : l.levels.keySet()){
-				
-				// Check if the level will have a search circle 
-				if (Math.abs(level - z) <= radius){
-					double levelRadius = (double) Math.sqrt((Math.pow(radius, 2) - Math.pow(Math.abs(level - z), 2)));
-					rangeHelper(new Circle2D.Double(x, y, levelRadius), l.levels.get(level).getRoot(), citiesInRange, false, true);
-					
+			for (int level : l.levels.keySet()) {
+
+				// Check if the level will have a search circle
+				if (Math.abs(level - z) <= radius) {
+					double levelRadius = (double) Math
+							.sqrt((Math.pow(radius, 2) - Math.pow(
+									Math.abs(level - z), 2)));
+					rangeHelper(new Circle2D.Double(x, y, levelRadius),
+							l.levels.get(level).getRoot(), citiesInRange,
+							false, true);
+
 				}
 			}
-			
-			
-//			rangeHelper(new Circle2D.Double(x, y, radius),
-//					pmQuadtree.getRoot(), citiesInRange, false, true);
+
+			// rangeHelper(new Circle2D.Double(x, y, radius),
+			// pmQuadtree.getRoot(), citiesInRange, false, true);
 
 			/* print out cities within range */
 			if (citiesInRange.isEmpty()) {
@@ -1627,21 +1743,24 @@ public class Command {
 			addErrorNode("noRoadsExistInRange", commandNode, parametersNode);
 		} else {
 			final TreeSet<Geometry> roadsInRange = new TreeSet<Geometry>();
-			
+
 			// For loop checking if level should be searched for cities
-						for (int level : l.levels.keySet()){
-							
-							// Check if the level will have a search circle 
-							if (Math.abs(level - z) <= radius){
-								double levelRadius = (double) Math.sqrt((Math.pow(radius, 2) - Math.pow(Math.abs(level - z), 2)));
-								rangeHelper(new Circle2D.Double(x, y, levelRadius), l.levels.get(level).getRoot(), roadsInRange, true, false);
-								
-							}
-						}
-			
-			
-//			rangeHelper(new Circle2D.Double(x, y, radius),
-//					pmQuadtree.getRoot(), roadsInRange, true, false);
+			for (int level : l.levels.keySet()) {
+
+				// Check if the level will have a search circle
+				if (Math.abs(level - z) <= radius) {
+					double levelRadius = (double) Math
+							.sqrt((Math.pow(radius, 2) - Math.pow(
+									Math.abs(level - z), 2)));
+					rangeHelper(new Circle2D.Double(x, y, levelRadius),
+							l.levels.get(level).getRoot(), roadsInRange, true,
+							false);
+
+				}
+			}
+
+			// rangeHelper(new Circle2D.Double(x, y, radius),
+			// pmQuadtree.getRoot(), roadsInRange, true, false);
 
 			/* print out cities within range */
 			if (roadsInRange.isEmpty()) {
@@ -1689,7 +1808,8 @@ public class Command {
 			final Black leaf = (Black) node;
 			for (Geometry g : leaf.getGeometry()) {
 				if (includeCities
-						&& g.isCity() && ((City)g).isPortal() == false
+						&& g.isCity()
+						&& ((City) g).isPortal() == false
 						&& !gInRange.contains(g)
 						&& Inclusive2DIntersectionVerifier.intersects(
 								((City) g).toPoint2D(), range)) {
@@ -1766,7 +1886,8 @@ public class Command {
 		if (n.getType() == Node.BLACK) {
 			Black b = (Black) n;
 
-			if (b.getCity() != null && b.getCity().isPortal() == false
+			if (b.getCity() != null
+					&& b.getCity().isPortal() == false
 					&& pmQuadtree.isIsolatedCity(b.getCity()) == isNearestIsolatedCity) {
 				return b.getCity();
 			}
@@ -1783,8 +1904,57 @@ public class Command {
 					Black b = (Black) kid;
 					City c = b.getCity();
 
-					if (c != null && c.isPortal() == false
+					if (c != null
+							&& c.isPortal() == false
 							&& pmQuadtree.isIsolatedCity(c) == isNearestIsolatedCity) {
+						double dist = point.distance(c.toPoint2D());
+						nearCities.add(new NearestSearchRegion(kid, dist, c));
+					}
+				} else if (kid.getType() == Node.GRAY) {
+					double dist = Shape2DDistanceCalculator.distance(point,
+							g.getChildRegion(i));
+					nearCities.add(new NearestSearchRegion(kid, dist, null));
+				}
+			}
+
+			try {
+				n = nearCities.remove().node;
+			} catch (Exception ex) {
+				throw new IllegalStateException();
+			}
+		}
+		return ((Black) n).getCity();
+	}
+	
+	private City nearestCityHelper(Point2D.Float point,
+			boolean isNearestIsolatedCity, PMQuadtree quadtree) {
+		Node n = quadtree.getRoot();
+		PriorityQueue<NearestSearchRegion> nearCities = new PriorityQueue<NearestSearchRegion>();
+
+		if (n.getType() == Node.BLACK) {
+			Black b = (Black) n;
+
+			if (b.getCity() != null
+					&& b.getCity().isPortal() == false
+					&& quadtree.isIsolatedCity(b.getCity()) == isNearestIsolatedCity) {
+				return b.getCity();
+			}
+		}
+
+		while (n.getType() == Node.GRAY) {
+			Gray g = (Gray) n;
+			Node kid;
+
+			for (int i = 0; i < 4; i++) {
+				kid = g.getChild(i);
+
+				if (kid.getType() == Node.BLACK) {
+					Black b = (Black) kid;
+					City c = b.getCity();
+
+					if (c != null
+							&& c.isPortal() == false
+							&& quadtree.isIsolatedCity(c) == isNearestIsolatedCity) {
 						double dist = point.distance(c.toPoint2D());
 						nearCities.add(new NearestSearchRegion(kid, dist, c));
 					}
